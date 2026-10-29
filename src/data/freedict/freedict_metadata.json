@@ -1,0 +1,12 @@
+{
+  "title": "English-Turkish FreeDict Dictionary",
+  "edition": "0.3",
+  "date": "2017-12-03",
+  "declaredExtent": "36589 headwords",
+  "license": "GNU General Public License v2.0 or later (GPL-2.0-or-later)",
+  "sourceUrl": "https://freedict.org/downloads/",
+  "projectUrl": "http://freedict.org/",
+  "author": "FreeDict Project (Michael Bunk, Sebastian Humenda, Piotr Bański et al.)",
+  "uniqueHeadwords": 34405,
+  "reverseIndexWords": 48294
+}

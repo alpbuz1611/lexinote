@@ -1,0 +1,183 @@
+@import "tailwindcss";
+
+/* =========================================================================
+   LOCAL EMBEDDED FONTS (100% Offline & Reliable Rendering)
+   ========================================================================= */
+@font-face {
+  font-family: 'Noto Sans';
+  src: url('/fonts/NotoSans-Regular.ttf') format('truetype'),
+       url('./assets/fonts/NotoSans-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Noto Sans';
+  src: url('/fonts/NotoSans-Bold.ttf') format('truetype'),
+       url('./assets/fonts/NotoSans-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Noto Serif';
+  src: url('/fonts/NotoSerif-Regular.ttf') format('truetype'),
+       url('./assets/fonts/NotoSerif-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Noto Serif';
+  src: url('/fonts/NotoSerif-Bold.ttf') format('truetype'),
+       url('./assets/fonts/NotoSerif-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'DejaVu Mono';
+  src: url('/fonts/DejaVuSansMono.ttf') format('truetype'),
+       url('./assets/fonts/DejaVuSansMono.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  --font-sans: 'Noto Sans', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Noto Serif', 'Lora', Georgia, serif;
+  --font-mono: 'DejaVu Mono', 'Fira Code', monospace;
+  --font-heading: 'Noto Sans', 'Plus Jakarta Sans', sans-serif;
+}
+
+:root {
+  --font-sans: 'Noto Sans', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Noto Serif', 'Lora', Georgia, serif;
+  --font-mono: 'DejaVu Mono', 'Fira Code', monospace;
+  --font-heading: 'Noto Sans', 'Plus Jakarta Sans', sans-serif;
+}
+
+::selection {
+  background-color: #18181b !important;
+  color: #ffffff !important;
+}
+
+::-moz-selection {
+  background-color: #18181b !important;
+  color: #ffffff !important;
+}
+
+/* =========================================================================
+   LEXINOTE THEME SYSTEM — STRICTLY 2 AUTHENTIC THEMES: PROFESSIONAL & JOURNAL
+   WITH COMPREHENSIVE SLEEK DARK MODE (AYDINLIK & ŞIK KARANLIK MOD)
+   ========================================================================= */
+
+/* 1. TASARIM A — PROFESSIONAL (Aydınlık / Light) */
+.theme-professional,
+:root {
+  --bg-primary: #F5F7FA;       /* Genel arka plan */
+  --bg-secondary: #FFFFFF;     /* Kart / navigasyon yüzeyi */
+  --bg-surface: #E8EDF3;       /* İkincil mavi-gri yüzey */
+  --bg-hover: #D6E4F0;         /* Seçili / hover arka planı */
+  --border-color: #D9E2EC;     /* Kenarlık */
+  --text-main: #334155;        /* Ana metin */
+  --text-muted: #64748B;       /* İkincil metin */
+  --accent: #243B53;           /* Ana lacivert */
+  --accent-light: #D6E4F0;     /* Seçili öğe arka planı */
+  --accent-hover: #1b2d40;     /* Koyu lacivert hover */
+  --accent-ring: rgba(36, 59, 83, 0.25);
+  --badge-work: #243B53;
+  --badge-work-bg: #E8EDF3;
+  --editor-font: var(--font-sans);
+  --editor-line-height: 1.6;
+  --editor-max-w: 920px;
+}
+
+/* 1.1 PROFESSIONAL — ŞIK KARANLIK MOD (Onyx Slate & Cosmic Blue) */
+html.dark.theme-professional,
+.dark.theme-professional,
+html.dark:root,
+.dark:root,
+.dark {
+  --bg-primary: #0B0F17;       /* Derin Gece Obsidiyeni */
+  --bg-secondary: #131B29;     /* Şık Kart & Panel Yüzeyi */
+  --bg-surface: #1E293B;       /* İkincil Yüzey & Araç Butonları */
+  --bg-hover: #28354A;         /* Seçili ve Hover Durumu */
+  --border-color: #233147;     /* Zarif İnce Kenarlık */
+  --text-main: #F1F5F9;        /* Kristal Berrak Metin */
+  --text-muted: #94A3B8;       /* Yumuşak İkincil Metin */
+  --accent: #38BDF8;           /* Işıltılı Modern Gökyüzü Mavisi */
+  --accent-light: rgba(56, 189, 248, 0.16);
+  --accent-hover: #0EA5E9;
+  --accent-ring: rgba(56, 189, 248, 0.35);
+  --badge-work: #38BDF8;
+  --badge-work-bg: rgba(56, 189, 248, 0.16);
+  --editor-font: var(--font-sans);
+  --editor-line-height: 1.6;
+  --editor-max-w: 920px;
+}
+
+/* 2. TASARIM B — JOURNAL (Aydınlık / Light) */
+.theme-journal {
+  --bg-primary: #FBF7F0;       /* Genel arka plan */
+  --bg-secondary: #F1EADF;     /* Sıcak yüzey */
+  --bg-surface: #E5E9DE;       /* Seçili / ikincil adaçayı yüzey */
+  --bg-hover: #ded4c4;         /* Hover arka planı */
+  --border-color: #DED4C4;     /* Kenarlık */
+  --text-main: #455747;        /* Koyu yeşil ana metin */
+  --text-muted: #788276;       /* İkincil adaçayı metin */
+  --accent: #82917A;           /* Adaçayı yeşili vurgu */
+  --accent-light: #E5E9DE;     /* Seçili öğe arka planı */
+  --accent-hover: #455747;     /* Koyu yeşil hover */
+  --accent-ring: rgba(130, 145, 122, 0.3);
+  --badge-work: #455747;
+  --badge-work-bg: #E5E9DE;
+  --editor-font: var(--font-serif);
+  --editor-line-height: 1.85;
+  --editor-max-w: 800px;
+}
+
+/* 2.1 JOURNAL — ŞIK KARANLIK MOD (Orman Gecesi & Dingin Adaçayı) */
+html.dark.theme-journal,
+.dark.theme-journal {
+  --bg-primary: #121614;       /* Dingin Sıcak Orman Kömürü */
+  --bg-secondary: #1A211D;     /* Adaçayı Tonlu Kart Yüzeyi */
+  --bg-surface: #242E28;       /* İkincil Yüzey */
+  --bg-hover: #303D35;         /* Hover / Seçili Arka Plan */
+  --border-color: #2D3A32;     /* Yumuşak Kenarlık */
+  --text-main: #EAEFEA;        /* Sıcak Kağıt Metin */
+  --text-muted: #98A79B;       /* Adaçayı İkincil Metin */
+  --accent: #9EC09E;           /* Aydınlık Adaçayı Yeşili */
+  --accent-light: rgba(158, 192, 158, 0.18);
+  --accent-hover: #B4D4B4;
+  --accent-ring: rgba(158, 192, 158, 0.35);
+  --badge-work: #9EC09E;
+  --badge-work-bg: rgba(158, 192, 158, 0.18);
+  --editor-font: var(--font-serif);
+  --editor-line-height: 1.85;
+  --editor-max-w: 800px;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  font-family: var(--editor-font);
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}

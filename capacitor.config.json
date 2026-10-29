@@ -1,0 +1,8 @@
+{
+  "appId": "com.lexinote.app",
+  "appName": "LexiNote",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}

@@ -1,0 +1,41 @@
+name: Build Windows Application (.exe)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    name: Package Windows Setup & Portable .exe
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Node Dependencies
+        run: npm install
+
+      - name: Compile Vite Web Application
+        run: npm run build
+
+      - name: Build Windows Installer & Portable Executable
+        run: npx electron-builder --win nsis portable
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Windows Executables (.exe)
+        uses: actions/upload-artifact@v4
+        with:
+          name: LexiNote-Windows-Setup-v0.1.0
+          path: |
+            release/*.exe
+          retention-days: 30
