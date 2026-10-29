@@ -46,12 +46,14 @@ jobs:
         run: |
           npx cap add android
           npx cap sync android
+          # Resolve Kotlin duplicate classes in modern Android build
+          echo -e "\nconfigurations.all { exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'; exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8' }" >> android/app/build.gradle
 
       - name: Build Android APK with Gradle
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug -x checkDebugDuplicateClasses --no-daemon
+          ./gradlew assembleDebug --no-daemon
 
       - name: Prepare APK Output
         run: |
