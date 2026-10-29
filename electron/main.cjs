@@ -6,8 +6,8 @@ const fs = require('fs');
 app.commandLine.appendSwitch('no-sandbox');
 
 function createWindow() {
-  const iconPath = process.platform === 'win32' 
-    ? path.join(__dirname, '../build/icon.ico')
+  const iconPath = fs.existsSync(path.join(__dirname, '../build/icon.png'))
+    ? path.join(__dirname, '../build/icon.png')
     : path.join(__dirname, '../public/icons/icon-512.png');
 
   const win = new BrowserWindow({

@@ -31,7 +31,7 @@ jobs:
         run: npm run build
 
       - name: Build Windows Installer & Portable Executable
-        run: npx electron-builder --win nsis portable
+        run: npx electron-builder --win nsis portable --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

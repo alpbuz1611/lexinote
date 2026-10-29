@@ -2,6 +2,8 @@
   "name": "lexinote",
   "private": true,
   "version": "0.1.0",
+  "description": "Offline-first bilingual knowledge workstation with rich text editing, interactive mind mapping, local dictionaries, and AES-256 encrypted vault.",
+  "author": "Yigit Alp Buz <yigitalpbuz1@gmail.com>",
   "type": "module",
   "main": "electron/main.cjs",
   "scripts": {
@@ -42,7 +44,7 @@
         "nsis",
         "portable"
       ],
-      "icon": "build/icon.ico"
+      "icon": "build/icon.png"
     },
     "nsis": {
       "oneClick": false,
