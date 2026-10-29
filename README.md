@@ -178,7 +178,7 @@ Download the native Windows setup package directly:
 
 [![Download Windows EXE](https://img.shields.io/badge/⬇️_Download-Windows_EXE_(Setup)-blue?style=for-the-badge&logo=windows)](https://github.com/alpbuz1611/lexinote/releases)
 
-1. Click **[Download Windows EXE](https://github.com/alpbuz1611/lexinote/releases)** (or direct download [LexiNote-Setup-0.1.0.exe](https://github.com/alpbuz1611/lexinote/releases/download/v0.1.0/LexiNote-Setup-0.1.0.exe)).
+1. Click **[Download Windows EXE](https://github.com/alpbuz1611/lexinote/releases)** (or direct download: [LexiNote.Setup.0.1.0.exe](https://github.com/alpbuz1611/lexinote/releases/download/v0.1.0/LexiNote.Setup.0.1.0.exe) | Portable: [LexiNote.0.1.0.exe](https://github.com/alpbuz1611/lexinote/releases/download/v0.1.0/LexiNote.0.1.0.exe)).
 2. Run the installer — it creates Start Menu and Desktop shortcuts with custom high-res icons.
 3. Enjoy complete zero-telemetry, offline knowledge management in its own dedicated window.
 

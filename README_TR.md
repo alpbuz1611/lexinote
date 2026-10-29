@@ -194,7 +194,7 @@ Doğrudan Windows `.exe` kurulum paketini indirin:
 
 [![Windows EXE İndir](https://img.shields.io/badge/⬇️_%C4%B0ndir-Windows_EXE_(Setup)-blue?style=for-the-badge&logo=windows)](https://github.com/alpbuz1611/lexinote/releases)
 
-1. **[Windows EXE İndir](https://github.com/alpbuz1611/lexinote/releases)** butonuna tıklayın (veya doğrudan [LexiNote-Setup-0.1.0.exe](https://github.com/alpbuz1611/lexinote/releases/download/v0.1.0/LexiNote-Setup-0.1.0.exe)).
+1. **[Windows EXE İndir](https://github.com/alpbuz1611/lexinote/releases)** butonuna tıklayın (veya doğrudan: [LexiNote.Setup.0.1.0.exe](https://github.com/alpbuz1611/lexinote/releases/download/v0.1.0/LexiNote.Setup.0.1.0.exe) | Portable: [LexiNote.0.1.0.exe](https://github.com/alpbuz1611/lexinote/releases/download/v0.1.0/LexiNote.0.1.0.exe)).
 2. İndirilen setup dosyasına çift tıklayarak kurun; Başlat Menüsü ve Masaüstü kısayollarıyla bağımsız pencerede internetsiz kullanın.
 
 ### Seçenek B: Tarayıcı Üzerinden PWA Masaüstü Kurulumu
