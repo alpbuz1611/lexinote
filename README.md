@@ -1,8 +1,8 @@
 # 📚 LexiNote — Local-First Intelligent Knowledge & Journaling System (v0.1.0)
 
 [![Live Web App](https://img.shields.io/badge/Live_Demo-GitHub_Pages-brightgreen.svg)](https://alpbuz1611.github.io/lexinote/)
-[![Download Android APK](https://img.shields.io/badge/Download_APK-Android-success.svg?logo=android)](https://github.com/alpbuz1611/lexinote/actions)
-[![Download Windows EXE](https://img.shields.io/badge/Download_EXE-Windows_11-blue.svg?logo=windows)](https://github.com/alpbuz1611/lexinote/actions)
+[![Download Android APK](https://img.shields.io/badge/Download_APK-Android-success.svg?logo=android)](https://github.com/alpbuz1611/lexinote/releases)
+[![Download Windows EXE](https://img.shields.io/badge/Download_EXE-Windows_11-blue.svg?logo=windows)](https://github.com/alpbuz1611/lexinote/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![FreeDict: GPLv2+](https://img.shields.io/badge/FreeDict-GPLv2%2B-orange.svg)](LICENSES.md)
 [![ENABLE1: Public Domain](https://img.shields.io/badge/ENABLE1-Public_Domain-lightgrey.svg)](LICENSES.md)
@@ -176,12 +176,11 @@ LexiNote runs natively on Windows 11 as a standalone desktop application:
 ### Option A: Standalone Windows Installer (.exe)
 Download the native Windows setup package directly:
 
-[![Download Windows EXE](https://img.shields.io/badge/⬇️_Download-Windows_EXE_(Setup)-blue?style=for-the-badge&logo=windows)](https://github.com/alpbuz1611/lexinote/actions)
+[![Download Windows EXE](https://img.shields.io/badge/⬇️_Download-Windows_EXE_(Setup)-blue?style=for-the-badge&logo=windows)](https://github.com/alpbuz1611/lexinote/releases)
 
-1. Click the **[Download Windows EXE](https://github.com/alpbuz1611/lexinote/actions)** button above (or visit GitHub Actions / Releases).
-2. Download **`LexiNote-Windows-Setup-v0.1.0`** (includes both `.exe` installer and portable executable).
-3. Run the installer — it creates Start Menu and Desktop shortcuts with custom high-res icons.
-4. Enjoy complete zero-telemetry, offline knowledge management in its own dedicated window.
+1. Click **[Download Windows EXE](https://github.com/alpbuz1611/lexinote/releases)** (or direct download [LexiNote-Setup-0.1.0.exe](https://github.com/alpbuz1611/lexinote/releases/download/v0.1.0/LexiNote-Setup-0.1.0.exe)).
+2. Run the installer — it creates Start Menu and Desktop shortcuts with custom high-res icons.
+3. Enjoy complete zero-telemetry, offline knowledge management in its own dedicated window.
 
 ### Option B: Native Progressive Web App (Edge & Chrome)
 1. Visit the live web app: **[https://alpbuz1611.github.io/lexinote/](https://alpbuz1611.github.io/lexinote/)** in Edge or Google Chrome.
@@ -194,11 +193,11 @@ Download the native Windows setup package directly:
 
 Install the standalone Android APK directly to your mobile device:
 
-[![Download Android APK](https://img.shields.io/badge/⬇️_Download-Android_APK_(v0.1.0)-success?style=for-the-badge&logo=android)](https://github.com/alpbuz1611/lexinote/actions)
+[![Download Android APK](https://img.shields.io/badge/⬇️_Download-Android_APK_(v0.1.0)-success?style=for-the-badge&logo=android)](https://github.com/alpbuz1611/lexinote/releases)
 
-1. Click the **[Download Android APK](https://github.com/alpbuz1611/lexinote/actions)** button above (or visit the GitHub Actions / Releases tab).
-2. Download the compiled **`lexinote-apk`** (`app-release-unsigned.apk` or signed package) to your Android device.
-3. Tap the downloaded file to install and start using LexiNote completely offline on your smartphone or tablet!
+1. Click **[Download Android APK](https://github.com/alpbuz1611/lexinote/releases)** (or direct download [lexinote-v0.1.0.apk](https://github.com/alpbuz1611/lexinote/releases/download/v0.1.0/lexinote-v0.1.0.apk)).
+2. Open the downloaded `.apk` file on your Android phone.
+3. Tap **Install** and enjoy LexiNote completely offline on your smartphone or tablet!
 
 ---
 

@@ -1,8 +1,8 @@
 # 📚 LexiNote — Çok Dilli Akıllı Not & Bilgi Yönetimi Sistemi (v0.1.0)
 
 [![Canlı Web Uygulaması](https://img.shields.io/badge/Canl%C4%B1_Web-GitHub_Pages-brightgreen.svg)](https://alpbuz1611.github.io/lexinote/)
-[![Android APK İndir](https://img.shields.io/badge/APK_%C4%B0ndir-Android-success.svg?logo=android)](https://github.com/alpbuz1611/lexinote/actions)
-[![Windows EXE İndir](https://img.shields.io/badge/Windows_EXE-Windows_11-blue.svg?logo=windows)](https://github.com/alpbuz1611/lexinote/actions)
+[![Android APK İndir](https://img.shields.io/badge/APK_%C4%B0ndir-Android-success.svg?logo=android)](https://github.com/alpbuz1611/lexinote/releases)
+[![Windows EXE İndir](https://img.shields.io/badge/Windows_EXE-Windows_11-blue.svg?logo=windows)](https://github.com/alpbuz1611/lexinote/releases)
 [![Sürüm](https://img.shields.io/badge/s%C3%BCr%C3%BCm-v0.1.0--beta-blue.svg)](https://github.com/alpbuz1611/lexinote/releases)
 [![Lisans](https://img.shields.io/badge/lisans-MIT-green.svg)](LICENSE)
 [![FreeDict](https://img.shields.io/badge/FreeDict-GPLv2%2B-orange.svg)](LICENSES.md)
@@ -192,11 +192,10 @@ LexiNote, Windows 11 üzerinde bağımsız bir masaüstü uygulaması olarak ça
 ### Seçenek A: Doğrudan Windows Kurulum Dosyası (.exe)
 Doğrudan Windows `.exe` kurulum paketini indirin:
 
-[![Windows EXE İndir](https://img.shields.io/badge/⬇️_%C4%B0ndir-Windows_EXE_(Setup)-blue?style=for-the-badge&logo=windows)](https://github.com/alpbuz1611/lexinote/actions)
+[![Windows EXE İndir](https://img.shields.io/badge/⬇️_%C4%B0ndir-Windows_EXE_(Setup)-blue?style=for-the-badge&logo=windows)](https://github.com/alpbuz1611/lexinote/releases)
 
-1. Yukarıdaki **[Windows EXE İndir](https://github.com/alpbuz1611/lexinote/actions)** butonuna tıklayın (veya GitHub Actions sekmesine gidin).
-2. **`LexiNote-Windows-Setup-v0.1.0`** paketini indirin (içinde hem `.exe` kurulum sihirbazı hem de kurulumsuz çalışan Portable sürüm yer alır).
-3. Çift tıklayarak kurun; Başlat Menüsü ve Masaüstü kısayollarıyla bağımsız pencerede internetsiz kullanın.
+1. **[Windows EXE İndir](https://github.com/alpbuz1611/lexinote/releases)** butonuna tıklayın (veya doğrudan [LexiNote-Setup-0.1.0.exe](https://github.com/alpbuz1611/lexinote/releases/download/v0.1.0/LexiNote-Setup-0.1.0.exe)).
+2. İndirilen setup dosyasına çift tıklayarak kurun; Başlat Menüsü ve Masaüstü kısayollarıyla bağımsız pencerede internetsiz kullanın.
 
 ### Seçenek B: Tarayıcı Üzerinden PWA Masaüstü Kurulumu
 1. Canlı web adresini açın: **[https://alpbuz1611.github.io/lexinote/](https://alpbuz1611.github.io/lexinote/)** (Edge veya Chrome ile).
@@ -209,11 +208,10 @@ Doğrudan Windows `.exe` kurulum paketini indirin:
 
 LexiNote'u Android telefon veya tabletinize doğrudan APK olarak kurun:
 
-[![Android APK İndir](https://img.shields.io/badge/⬇️_%C4%B0ndir-Android_APK_(v0.1.0)-success?style=for-the-badge&logo=android)](https://github.com/alpbuz1611/lexinote/actions)
+[![Android APK İndir](https://img.shields.io/badge/⬇️_%C4%B0ndir-Android_APK_(v0.1.0)-success?style=for-the-badge&logo=android)](https://github.com/alpbuz1611/lexinote/releases)
 
-1. Yukarıdaki **[Android APK İndir](https://github.com/alpbuz1611/lexinote/actions)** butonuna tıklayın (veya GitHub Actions sekmesine gidin).
-2. Derlenen **`lexinote-apk`** paketini telefonunuza indirin.
-3. İndirilen `.apk` dosyasına dokunarak **Yükle** deyin ve LexiNote'u telefonunuzda %100 internetsiz kullanın!
+1. **[Android APK İndir](https://github.com/alpbuz1611/lexinote/releases)** butonuna tıklayın (veya doğrudan [lexinote-v0.1.0.apk](https://github.com/alpbuz1611/lexinote/releases/download/v0.1.0/lexinote-v0.1.0.apk)).
+2. İndirilen `.apk` dosyasına dokunarak **Yükle** deyin ve LexiNote'u telefonunuzda %100 internetsiz kullanın!
 
 ---
 

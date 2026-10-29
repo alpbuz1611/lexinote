@@ -6,6 +6,9 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-windows:
     name: Package Windows Setup & Portable .exe
@@ -32,10 +35,23 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload Windows Executables (.exe)
+      - name: Upload Windows Executables Artifact
         uses: actions/upload-artifact@v4
         with:
           name: LexiNote-Windows-Setup-v0.1.0
           path: |
             release/*.exe
           retention-days: 30
+
+      - name: Publish Windows .exe to GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/heads/main')
+        with:
+          tag_name: v0.1.0
+          name: "LexiNote v0.1.0 (Public Release)"
+          draft: false
+          prerelease: false
+          files: |
+            release/*.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
