@@ -257,3 +257,4 @@ node scripts/verify_e2e_release.js
 - **Wordlist:** ENABLE1 English wordlist is in the **Public Domain**.
 - **Icons:** [Lucide Icons](https://lucide.dev/) (ISC License).
 - **Typography:** Google Noto Fonts (SIL Open Font License 1.1), DejaVu Fonts (Bitstream Vera License).
+-**Communication** yigitalpbuz1@gmail.com
