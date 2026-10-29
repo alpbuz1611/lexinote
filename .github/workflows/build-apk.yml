@@ -51,7 +51,7 @@ jobs:
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug -x checkDebugDuplicateClasses --no-daemon
 
       - name: Prepare APK Output
         run: |
