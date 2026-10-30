@@ -171,6 +171,7 @@ export default function App() {
     localStorage.setItem('lexinote_app_language', newLang);
     if (forceReloadNotes || isDefaultNotesList(notes)) {
       const fresh = getDefaultNotes(newLang);
+      storageService.saveNotesBatch(fresh).catch(console.error);
       setNotes(fresh);
       setActiveNoteId(fresh[0]?.id || null);
       localStorage.setItem('lexinote_notes_v4', JSON.stringify(fresh));
@@ -181,6 +182,7 @@ export default function App() {
   // Explicitly Reload Starter Notes in Current Active Language
   const handleReloadStarterNotes = () => {
     const fresh = getDefaultNotes(appLanguage);
+    storageService.saveNotesBatch(fresh).catch(console.error);
     setNotes(fresh);
     setActiveNoteId(fresh[0]?.id || null);
     localStorage.setItem('lexinote_notes_v4', JSON.stringify(fresh));
@@ -188,7 +190,7 @@ export default function App() {
     sound.playPop();
   };
 
-  // Primary Storage Initialization & LocalStorage Migration to IndexedDB
+  // Primary Storage Initialization, LocalStorage Migration & Cross-Tab Sync
   useEffect(() => {
     let isMounted = true;
     async function initStorage() {
@@ -203,7 +205,7 @@ export default function App() {
           setNotes(dbNotes);
           setActiveNoteId(prev => (prev && dbNotes.some(n => n.id === prev)) ? prev : dbNotes[0].id);
         } else if (isMounted && (!dbNotes || dbNotes.length === 0)) {
-          // If IndexedDB is empty, seed it with current notes
+          // If IndexedDB is empty on first launch, seed it with current notes
           await storageService.saveNotesBatch(notes);
         }
       } catch (err) {
@@ -211,29 +213,57 @@ export default function App() {
       }
     }
     initStorage();
-    return () => { isMounted = false; };
-  }, []);
 
-  // Persist Notes (Primary: IndexedDB, Fallback: Sanitized localStorage)
-  useEffect(() => {
-    if (!notes || notes.length === 0) return;
-
-    // 1. Asynchronously persist to IndexedDB
-    storageService.saveNotesBatch(notes).catch(err => {
-      console.error('[LexiNote Storage] IndexedDB batch save failed:', err);
+    // Multi-Tab Synchronization via BroadcastChannel
+    const unsubscribeSync = storageService.onSyncEvent((event) => {
+      if (!isMounted || !event) return;
+      if (event.type === 'NOTE_SAVED' && event.note) {
+        setNotes(prev => {
+          const existingIdx = prev.findIndex(n => n.id === event.note.id);
+          if (existingIdx >= 0) {
+            const existingTime = new Date(prev[existingIdx].updatedAt || 0).getTime();
+            const incomingTime = new Date(event.note.updatedAt || 0).getTime();
+            // Optimistic concurrency control: only update if incoming note is newer or equal
+            if (incomingTime >= existingTime) {
+              const updated = [...prev];
+              updated[existingIdx] = { ...prev[existingIdx], ...event.note };
+              return updated;
+            }
+            return prev;
+          } else {
+            return [event.note, ...prev];
+          }
+        });
+      } else if (event.type === 'NOTE_DELETED' && event.noteId) {
+        setNotes(prev => prev.filter(n => n.id !== event.noteId));
+        setActiveNoteId(prev => (prev === event.noteId ? null : prev));
+      } else if (event.type === 'NOTES_BATCH_SAVED' || event.type === 'NOTES_RESET') {
+        storageService.getAllNotes().then(freshNotes => {
+          if (isMounted && Array.isArray(freshNotes) && freshNotes.length > 0) {
+            setNotes(freshNotes);
+          }
+        }).catch(console.error);
+      }
     });
 
-    // 2. Synchronous fallback write to localStorage (sanitized)
-    try {
-      const sanitized = notes.map(n => storageService.sanitizeNote(n));
-      localStorage.setItem('lexinote_notes_v4', JSON.stringify(sanitized));
-    } catch (e) {
-      if (e?.name === 'QuotaExceededError') {
-        console.warn('Storage quota exceeded in localStorage fallback; notes safely preserved in IndexedDB.', e);
-      } else {
-        console.error('Failed to save notes to storage:', e);
+    return () => {
+      isMounted = false;
+      unsubscribeSync();
+    };
+  }, []);
+
+  // Debounced non-blocking offline mirror to localStorage (Safe secondary fallback)
+  useEffect(() => {
+    if (!notes || notes.length === 0) return;
+    const timer = setTimeout(() => {
+      try {
+        const sanitized = notes.map(n => storageService.sanitizeNote(n));
+        localStorage.setItem('lexinote_notes_v4', JSON.stringify(sanitized));
+      } catch (e) {
+        // Ignore quota exceeded in fallback; primary notes are safe in IndexedDB
       }
-    }
+    }, 500);
+    return () => clearTimeout(timer);
   }, [notes]);
 
   useEffect(() => {
@@ -316,12 +346,26 @@ export default function App() {
       updatedAt: new Date().toISOString()
     };
 
+    // Targeted note-level persistence to IndexedDB
+    storageService.saveNote(newNote).catch(err => {
+      console.error('[LexiNote Storage] Failed to save new note to IndexedDB:', err);
+    });
+
     setNotes([newNote, ...notes]);
     setActiveNoteId(newNote.id);
   };
 
   const handleUpdateNote = (updatedNote) => {
-    // If updating an unlocked encrypted note, keep encryptedData up to date in the background
+    // 1. Targeted note-level persistence with Optimistic Concurrency Control (OCC)
+    storageService.saveNote(updatedNote).catch(err => {
+      if (err.name === 'ConcurrencyConflictError') {
+        console.warn('[LexiNote Storage] Concurrency conflict detected on saveNote:', err.message);
+      } else {
+        console.error('[LexiNote Storage] Failed to save updated note to IndexedDB:', err);
+      }
+    });
+
+    // 2. If updating an unlocked encrypted note, keep encryptedData up to date in the background
     if (updatedNote.isLocked && updatedNote._tempUnlocked && updatedNote._activePin) {
       encryptData(
         {
@@ -331,9 +375,11 @@ export default function App() {
         },
         updatedNote._activePin
       ).then(freshEncrypted => {
+        const withFresh = { ...updatedNote, encryptedData: freshEncrypted };
+        storageService.saveNote(withFresh).catch(console.error);
         setNotes(prev =>
           prev.map(n =>
-            n.id === updatedNote.id ? { ...updatedNote, encryptedData: freshEncrypted } : n
+            n.id === updatedNote.id ? withFresh : n
           )
         );
       }).catch(err => {
@@ -381,11 +427,13 @@ export default function App() {
   };
 
   const handleTogglePin = (noteId) => {
-    setNotes(
-      notes.map(n =>
-        n.id === noteId ? { ...n, isPinned: !n.isPinned, updatedAt: new Date().toISOString() } : n
-      )
-    );
+    setNotes(prev => {
+      const target = prev.find(n => n.id === noteId);
+      if (!target) return prev;
+      const updated = { ...target, isPinned: !target.isPinned, updatedAt: new Date().toISOString() };
+      storageService.saveNote(updated).catch(console.error);
+      return prev.map(n => (n.id === noteId ? updated : n));
+    });
   };
 
   const handleLockNote = async (noteId, pin) => {
@@ -405,25 +453,20 @@ export default function App() {
 
     try {
       const encryptedData = await encryptData(payload, effectivePin);
-      setNotes(
-        notes.map(n => {
-          if (n.id === noteId) {
-            return {
-              ...n,
-              isLocked: true,
-              _tempUnlocked: false,
-              _activePin: undefined,
-              pinCode: undefined,
-              encryptedData,
-              content: '',
-              todos: [],
-              gratitude: [],
-              updatedAt: new Date().toISOString()
-            };
-          }
-          return n;
-        })
-      );
+      const lockedNote = {
+        ...target,
+        isLocked: true,
+        _tempUnlocked: false,
+        _activePin: undefined,
+        pinCode: undefined,
+        encryptedData,
+        content: '',
+        todos: [],
+        gratitude: [],
+        updatedAt: new Date().toISOString()
+      };
+      storageService.saveNote(lockedNote).catch(console.error);
+      setNotes(prev => prev.map(n => (n.id === noteId ? lockedNote : n)));
     } catch (err) {
       console.error('Encryption failed:', err);
     }
@@ -629,6 +672,7 @@ export default function App() {
           localStorage.setItem('lexinote_app_language', lang);
           localStorage.setItem('lexinote_load_sample_notes', loadSampleNotes ? 'true' : 'false');
           const langNotes = loadSampleNotes ? getDefaultNotes(lang) : [createInitialBlankNote(lang)];
+          storageService.saveNotesBatch(langNotes).catch(console.error);
           setNotes(langNotes);
           setActiveNoteId(langNotes[0]?.id || null);
           localStorage.setItem('lexinote_notes_v4', JSON.stringify(langNotes));

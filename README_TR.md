@@ -31,7 +31,7 @@
 - [8. macOS Masaüstü Kurulumu (.dmg & .zip)](#8-macos-masaüstü-kurulumu-dmg--zip)
 - [9. Mobil Kurulum (Android APK)](#9-mobil-kurulum-android-apk)
 - [10. Adım Adım GitHub'a Yükleme Kılavuzu](#10-adım-adım-githuba-yükleme-kılavuzu)
-- [11. Kapsamlı Kalite Güvencesi ve Test Paketi (268 Test)](#11-kapsamlı-kalite-güvencesi-ve-test-paketi-268-test)
+- [11. Kapsamlı Kalite Güvencesi ve Test Paketi (308 Test)](#11-kapsamlı-kalite-güvencesi-ve-test-paketi-308-test)
 - [12. Gelecek Sürüm Yol Haritası (v0.2+)](#12-gelecek-sürüm-yol-haritası-v02)
 - [13. Lisanslar ve Hukuki Atıflar](#13-lisanslar-ve-hukuki-atıflar)
 
@@ -259,21 +259,28 @@ git push -u origin main
 
 ---
 
-## 11. Kapsamlı Kalite Güvencesi ve Test Paketi (268 Test)
+## 11. Kapsamlı Kalite Güvencesi ve Test Paketi (308 Test)
 
-LexiNote, veri tutarlılığı, kriptografik gizlilik, IndexedDB ölçekleme ve çevrimdışı sözlük bütünlüğünü garanti altına alan 268 adet otomatik teste sahiptir:
+LexiNote; veri tutarlılığı, kriptografik gizlilik, IndexedDB ölçekleme, eşzamanlı sekme kontrolü (OCC) ve React bileşen kullanıcı akışlarını kapsayan 308 adet otomatik teste sahiptir:
 
 ```bash
-# Tüm master test paketini çalıştırın (268 otomatik test)
+# Tüm master test paketini çalıştırın (308 otomatik test)
 npm test
+
+# Sadece React bileşen testlerini çalıştırın (Vitest + JSDOM)
+npm run test:unit
+
+# Sadece servis ve altyapı denetimlerini çalıştırın
+npm run test:qa
 ```
 
-Master test paketi şu 3 ana modülden oluşur:
-1. **v0.1.0 Kapsamlı Kalite Denetimi:** 148 otomatik test (`scripts/qa_audit/run_all_audits.js`)
-2. **IndexedDB Depolama Motoru & Stres Testi:** 83 otomatik test (`scripts/qa_indexeddb/run_all_indexeddb_tests.js`)
-3. **Uçtan Uca Sürüm ve Çeviri Doğrulama:** 37 otomatik test (`scripts/verify_e2e_release.js`)
+Master test paketi şu 4 ana katmandan oluşur:
+1. **v0.1.0 Kapsamlı Kalite Denetimi:** 148 otomatik servis/birim testi (`scripts/qa_audit/run_all_audits.js`)
+2. **IndexedDB Depolama Motoru & Stres Testi:** 103 otomatik işlem, OCC ve derin geçiş testi (`scripts/qa_indexeddb/run_all_indexeddb_tests.js`)
+3. **Uçtan Uca Sözlük ve Çeviri Doğrulama:** 37 otomatik iki dilli entegrasyon testi (`scripts/verify_e2e_release.js`)
+4. **React Bileşen Test Paketi:** Vitest ve Testing Library ile 20 otomatik arayüz bileşeni testi (`src/tests/*.test.jsx`)
 
-Ayrıntılı performans kıyaslamaları (1.000 not toplu yazma: 91 ms, tekil not okuma: 0.06 ms), 100.000 kelimelik metin dayanıklılığı ve hata kurtarma protokolleri için resmi [📄 Kapsamlı QA Raporu](docs/QA_REPORT.md) belgesini inceleyebilirsiniz.
+Ayrıntılı performans kıyaslamaları (1.000 not toplu yazma: 91 ms, tekil not okuma: 0.06 ms), 100.000 kelimelik metin dayanıklılığı, BroadcastChannel eşitlemesi ve hata kurtarma protokolleri için resmi [📄 Kapsamlı QA Raporu](docs/QA_REPORT.md) belgesini inceleyebilirsiniz.
 
 ### Test Sonuç Özeti
 ```text
@@ -287,10 +294,11 @@ Aşama 4: Çevrimdışı Sözlük & İmla Denetimi :  19 Başarılı, 0 Hatalı
 Aşama 5: WikiLinks, Grafik & Zihin Haritası:  48 Başarılı, 0 Hatalı
 Aşama 6: Çapraz Platform Paketleme Yolları :  10 Başarılı, 0 Hatalı
 Aşama 7: Performans & Gecikme Ölçümleri    :   5 Başarılı, 0 Hatalı
-Aşama 8: IndexedDB Motoru & Stres/Ölçek    :  83 Başarılı, 0 Hatalı
+Aşama 8: IndexedDB Motoru & Stres/Ölçek    : 103 Başarılı, 0 Hatalı
 Aşama 9: E2E Sözlük, Çok Anlamlılık & SOV  :  37 Başarılı, 0 Hatalı
+Aşama 10: React Bileşen Arayüz Testleri (Vitest): 20 Başarılı, 0 Hatalı
 ----------------------------------------------------------------
-TOPLAM: 268 BAŞARILI, 0 HATALI (%100.0 BAŞARI ORANI)
+TOPLAM: 308 BAŞARILI, 0 HATALI (%100.0 BAŞARI ORANI)
 ################################################################
 ```
 

@@ -31,7 +31,7 @@
 - [8. Windows 11 Desktop Installation (.exe & PWA)](#8-windows-11-desktop-installation-exe--pwa)
 - [9. macOS Desktop Installation (.dmg & .zip)](#9-macos-desktop-installation-dmg--zip)
 - [10. Mobile Installation (Android APK)](#10-mobile-installation-android-apk)
-- [11. Comprehensive Quality Assurance & Testing Suite (268 Tests)](#11-comprehensive-quality-assurance--testing-suite-268-tests)
+- [11. Comprehensive Quality Assurance & Testing Suite (308 Tests)](#11-comprehensive-quality-assurance--testing-suite-308-tests)
 - [12. Legal Attributions & Licenses](#12-legal-attributions--licenses)
 
 ---
@@ -219,21 +219,28 @@ Install the standalone Android APK directly to your mobile device:
 
 ---
 
-## 11. Comprehensive Quality Assurance & Testing Suite (268 Tests)
+## 11. Comprehensive Quality Assurance & Testing Suite (308 Tests)
 
-LexiNote features an exhaustive automated test harness covering data persistence, cryptographic privacy, editor modes, offline dictionaries, mindmap graph physics, and IndexedDB scale stress testing:
+LexiNote features an exhaustive automated test harness covering data persistence, cryptographic privacy, editor modes, offline dictionaries, mindmap graph physics, IndexedDB scale stress testing, concurrency control, and React component UI workflows:
 
 ```bash
-# Run the complete master test suite (268 automated tests)
+# Run the complete master test suite (308 automated tests)
 npm test
+
+# Run component tests only (Vitest + JSDOM)
+npm run test:unit
+
+# Run backend/service audits only
+npm run test:qa
 ```
 
 The master test suite executes:
-1. **v0.1.0 Master QA Audit:** 148 automated tests (`scripts/qa_audit/run_all_audits.js`)
-2. **IndexedDB Scale & Stress Suite:** 83 automated tests (`scripts/qa_indexeddb/run_all_indexeddb_tests.js`)
-3. **E2E Release Readiness & Lexicon Suite:** 37 automated tests (`scripts/verify_e2e_release.js`)
+1. **v0.1.0 Master QA Audit:** 148 automated service/unit tests (`scripts/qa_audit/run_all_audits.js`)
+2. **IndexedDB Scale & Stress Suite:** 103 automated persistence, OCC & migration tests (`scripts/qa_indexeddb/run_all_indexeddb_tests.js`)
+3. **E2E Release Readiness & Lexicon Suite:** 37 automated bilingual integration tests (`scripts/verify_e2e_release.js`)
+4. **React Component Testing Suite:** 20 automated UI component tests with Vitest & React Testing Library (`src/tests/*.test.jsx`)
 
-For detailed benchmark timings, 1,000-note scale evaluations, 100,000-word document tests, and failure recovery protocols, see the official [📄 Comprehensive QA Report](docs/QA_REPORT.md).
+For detailed benchmark timings, 1,000-note scale evaluations, 100,000-word document tests, cross-tab OCC specifications, and failure recovery protocols, see the official [📄 Comprehensive QA Report](docs/QA_REPORT.md).
 
 ### Summary of Test Execution
 ```text
@@ -247,10 +254,11 @@ Phase 4: Offline Dictionaries & Spellcheck :  19 Passed, 0 Failed
 Phase 5: WikiLinks, Graph & Mindmap Studio :  48 Passed, 0 Failed
 Phase 6: Cross-Platform Packaging Paths    :  10 Passed, 0 Failed
 Phase 7: Performance & Latency Benchmarks  :   5 Passed, 0 Failed
-Phase 8: IndexedDB Engine & Stress/Scale   :  83 Passed, 0 Failed
+Phase 8: IndexedDB Engine & Stress/Scale   : 103 Passed, 0 Failed
 Phase 9: E2E Release Readiness & Lexicon   :  37 Passed, 0 Failed
+Phase 10: React Component UI Tests (Vitest) :  20 Passed, 0 Failed
 ----------------------------------------------------------------
-TOTAL: 268 PASSED, 0 FAILED (100.0% SUCCESS RATE)
+TOTAL: 308 PASSED, 0 FAILED (100.0% SUCCESS RATE)
 ################################################################
 ```
 

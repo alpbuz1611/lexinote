@@ -1,8 +1,8 @@
 /**
- * LexiNote IndexedDB Storage Engine & LocalStorage Migration Service
+ * LexiNote IndexedDB Storage Engine, OCC Concurrency & LocalStorage Migration Service
  * 
  * Provides an offline-first, high-performance, asynchronous storage engine
- * for LexiNote notes, metadata, and migration backups.
+ * for LexiNote notes, metadata, multi-tab sync, and deep migration integrity.
  * 
  * Database: 'lexinote_db' (Version 1)
  * Stores:
@@ -15,9 +15,12 @@ export const DB_NAME = 'lexinote_db';
 export const DB_VERSION = 1;
 export const STORE_NOTES = 'notes';
 export const STORE_META = 'meta';
+export const SYNC_CHANNEL_NAME = 'lexinote_tab_sync';
 
 let cachedDB = null;
 let customIDBFactory = null;
+let syncChannel = null;
+const syncListeners = new Set();
 
 /**
  * Configure a custom IDBFactory (used in Node.js test environments, e.g. fake-indexeddb)
@@ -36,6 +39,74 @@ function getIDB() {
   if (typeof globalThis !== 'undefined' && globalThis.indexedDB) return globalThis.indexedDB;
   if (typeof window !== 'undefined' && window.indexedDB) return window.indexedDB;
   return null;
+}
+
+/**
+ * Initialize / retrieve the cross-tab BroadcastChannel
+ */
+export function getSyncChannel() {
+  if (syncChannel) return syncChannel;
+  if (typeof BroadcastChannel !== 'undefined') {
+    try {
+      syncChannel = new BroadcastChannel(SYNC_CHANNEL_NAME);
+      syncChannel.onmessage = (event) => {
+        if (event && event.data) {
+          syncListeners.forEach(listener => {
+            try {
+              listener(event.data);
+            } catch (e) {
+              console.error('LexiNote tab sync listener error:', e);
+            }
+          });
+        }
+      };
+    } catch (e) {
+      console.warn('BroadcastChannel not available in this environment:', e);
+    }
+  }
+  return syncChannel;
+}
+
+/**
+ * Broadcast an event to other browser tabs/windows
+ */
+export function broadcastSyncEvent(data) {
+  const ch = getSyncChannel();
+  if (ch) {
+    try {
+      ch.postMessage({
+        ...data,
+        senderId: Math.random().toString(36).substring(2),
+        timestamp: Date.now()
+      });
+    } catch (e) {
+      console.warn('Failed to broadcast sync event:', e);
+    }
+  }
+}
+
+/**
+ * Subscribe to cross-tab storage events
+ */
+export function onSyncEvent(listener) {
+  syncListeners.add(listener);
+  getSyncChannel(); // ensure channel is initialized
+  return () => {
+    syncListeners.delete(listener);
+  };
+}
+
+/**
+ * Close and reset the cross-tab sync channel (useful for test isolation)
+ */
+export function closeSyncChannel() {
+  if (syncChannel) {
+    try {
+      syncChannel.close();
+    } catch (e) {}
+    syncChannel = null;
+  }
+  syncListeners.clear();
 }
 
 /**
@@ -111,6 +182,7 @@ export function closeDB() {
     cachedDB.close();
     cachedDB = null;
   }
+  closeSyncChannel();
 }
 
 /**
@@ -147,6 +219,107 @@ export function sanitizeNote(note) {
     };
   }
   return { ...note };
+}
+
+/**
+ * Deep equality comparison for primitives, objects, arrays, and null/undefined.
+ */
+export function deepEqual(a, b) {
+  if (a === b) return true;
+  if (a === null || b === null || a === undefined || b === undefined) return a === b;
+  if (typeof a !== 'object' || typeof b !== 'object') return a === b;
+
+  if (Array.isArray(a) !== Array.isArray(b)) return false;
+
+  if (Array.isArray(a)) {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+      if (!deepEqual(a[i], b[i])) return false;
+    }
+    return true;
+  }
+
+  const keysA = Object.keys(a);
+  const keysB = Object.keys(b);
+  if (keysA.length !== keysB.length) return false;
+
+  for (const key of keysA) {
+    if (!Object.prototype.hasOwnProperty.call(b, key) || !deepEqual(a[key], b[key])) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Deeply verify all supported fields between an original legacy note and its persisted representation.
+ */
+export function deepVerifyMigratedNote(original, persisted) {
+  if (!persisted || typeof persisted !== 'object') {
+    throw new Error(`Migration verification failed: Record for note "${original?.id}" is missing or not an object in IndexedDB.`);
+  }
+
+  const expected = sanitizeNote(original);
+
+  // 1. Mandatory core identifiers
+  if (persisted.id !== expected.id) {
+    throw new Error(`Migration verification failed for note "${original.id}": Field "id" mismatch! Expected "${expected.id}", got "${persisted.id}".`);
+  }
+  if (persisted.title !== expected.title) {
+    throw new Error(`Migration verification failed for note "${original.id}": Field "title" mismatch! Expected "${expected.title}", got "${persisted.title}".`);
+  }
+  if (persisted.content !== expected.content) {
+    throw new Error(`Migration verification failed for note "${original.id}": Field "content" mismatch! Expected "${expected.content}", got "${persisted.content}".`);
+  }
+  if (persisted.mode !== expected.mode) {
+    throw new Error(`Migration verification failed for note "${original.id}": Field "mode" mismatch! Expected "${expected.mode}", got "${persisted.mode}".`);
+  }
+  if (Boolean(persisted.isPinned) !== Boolean(expected.isPinned)) {
+    throw new Error(`Migration verification failed for note "${original.id}": Field "isPinned" mismatch! Expected ${Boolean(expected.isPinned)}, got ${Boolean(persisted.isPinned)}.`);
+  }
+  if (Boolean(persisted.isLocked) !== Boolean(expected.isLocked)) {
+    throw new Error(`Migration verification failed for note "${original.id}": Field "isLocked" mismatch! Expected ${Boolean(expected.isLocked)}, got ${Boolean(persisted.isLocked)}.`);
+  }
+
+  // 2. Timestamps
+  if (expected.createdAt && persisted.createdAt !== expected.createdAt) {
+    throw new Error(`Migration verification failed for note "${original.id}": Field "createdAt" mismatch! Expected "${expected.createdAt}", got "${persisted.createdAt}".`);
+  }
+  if (expected.updatedAt && persisted.updatedAt !== expected.updatedAt) {
+    throw new Error(`Migration verification failed for note "${original.id}": Field "updatedAt" mismatch! Expected "${expected.updatedAt}", got "${persisted.updatedAt}".`);
+  }
+
+  // 3. Security & Locked Notes Validation
+  if (expected.isLocked) {
+    if (persisted.content !== '') {
+      throw new Error(`Migration verification failed for note "${original.id}": Locked note leaked plaintext content to disk!`);
+    }
+    if (persisted._activePin !== undefined || persisted.pinCode !== undefined) {
+      throw new Error(`Migration verification failed for note "${original.id}": Locked note leaked PIN code to disk!`);
+    }
+    if (!persisted.encryptedData || typeof persisted.encryptedData !== 'object') {
+      throw new Error(`Migration verification failed for note "${original.id}": Missing or invalid encryptedData on locked note!`);
+    }
+    if (!persisted.encryptedData.ciphertext || !persisted.encryptedData.iv || !persisted.encryptedData.salt) {
+      throw new Error(`Migration verification failed for note "${original.id}": Corrupted encryptedData payload (missing ciphertext, iv, or salt)!`);
+    }
+    if (!deepEqual(persisted.encryptedData, expected.encryptedData)) {
+      throw new Error(`Migration verification failed for note "${original.id}": Field "encryptedData" mismatch!`);
+    }
+  }
+
+  // 4. Arrays: tags, todos, gratitude
+  if (expected.tags && !deepEqual(persisted.tags, expected.tags)) {
+    throw new Error(`Migration verification failed for note "${original.id}": Field "tags" mismatch!`);
+  }
+  if (!deepEqual(persisted.todos || [], expected.todos || [])) {
+    throw new Error(`Migration verification failed for note "${original.id}": Field "todos" mismatch!`);
+  }
+  if (!deepEqual(persisted.gratitude || [], expected.gratitude || [])) {
+    throw new Error(`Migration verification failed for note "${original.id}": Field "gratitude" mismatch!`);
+  }
+
+  return true;
 }
 
 /**
@@ -198,9 +371,12 @@ export async function getNote(id) {
 }
 
 /**
- * Save or update a single note. Locked notes are sanitized before persisting.
+ * Save or update a single note with Optimistic Concurrency Control (OCC).
+ * Options:
+ *   - checkConflict: boolean (default true). If true, checks whether the database has a newer updatedAt.
+ *   - force: boolean (default false). If true, overrides OCC conflict.
  */
-export async function saveNote(note) {
+export async function saveNote(note, options = { checkConflict: true, force: false }) {
   if (!note || !note.id) {
     throw new Error('saveNote requires a valid note with an "id" property.');
   }
@@ -211,16 +387,67 @@ export async function saveNote(note) {
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_NOTES, 'readwrite');
     const store = tx.objectStore(STORE_NOTES);
-    const request = store.put(sanitized);
 
-    tx.oncomplete = () => resolve(sanitized);
-    tx.onerror = (event) => reject(new Error(`saveNote failed: ${event.target.error?.message}`));
-    tx.onabort = (event) => reject(new Error(`saveNote transaction aborted: ${event.target.error?.message}`));
+    // Read pre-check for OCC conflict detection
+    const getReq = store.get(sanitized.id);
+
+    let conflictError = null;
+
+    getReq.onsuccess = () => {
+      const existing = getReq.result;
+      if (existing) {
+        if (options?.checkConflict && !options?.force && existing.updatedAt && sanitized.updatedAt) {
+          const existingTime = new Date(existing.updatedAt).getTime();
+          const incomingTime = new Date(sanitized.updatedAt).getTime();
+          if (existingTime > incomingTime) {
+            conflictError = new Error(
+              `Concurrency Conflict on note "${sanitized.id}": Database contains a newer revision (${existing.updatedAt}) than the incoming change (${sanitized.updatedAt}).`
+            );
+            conflictError.name = 'ConcurrencyConflictError';
+            conflictError.existingNote = existing;
+            conflictError.incomingNote = sanitized;
+            tx.abort();
+            return;
+          }
+        }
+        sanitized.version = (existing.version || 0) + 1;
+      } else {
+        sanitized.version = 1;
+      }
+
+      store.put(sanitized);
+    };
+
+    getReq.onerror = (e) => {
+      reject(new Error(`saveNote read pre-check failed: ${e.target.error?.message}`));
+    };
+
+    tx.oncomplete = () => {
+      broadcastSyncEvent({ type: 'NOTE_SAVED', note: sanitized });
+      resolve(sanitized);
+    };
+
+    tx.onerror = (event) => {
+      if (conflictError) {
+        reject(conflictError);
+      } else {
+        reject(new Error(`saveNote failed: ${event.target.error?.message}`));
+      }
+    };
+
+    tx.onabort = (event) => {
+      if (conflictError) {
+        reject(conflictError);
+      } else {
+        reject(new Error(`saveNote transaction aborted: ${event.target.error?.message || 'Transaction aborted'}`));
+      }
+    };
   });
 }
 
 /**
  * Atomic batch save of multiple notes in a single readwrite transaction.
+ * Used for initial database seeding, full imports, or deliberate bulk migrations.
  */
 export async function saveNotesBatch(notes) {
   if (!Array.isArray(notes)) {
@@ -240,14 +467,17 @@ export async function saveNotesBatch(notes) {
       }
     }
 
-    tx.oncomplete = () => resolve(sanitizedList);
+    tx.oncomplete = () => {
+      broadcastSyncEvent({ type: 'NOTES_BATCH_SAVED', count: sanitizedList.length });
+      resolve(sanitizedList);
+    };
     tx.onerror = (event) => reject(new Error(`saveNotesBatch failed: ${event.target.error?.message}`));
     tx.onabort = (event) => reject(new Error(`saveNotesBatch aborted: ${event.target.error?.message}`));
   });
 }
 
 /**
- * Delete a note by its ID.
+ * Delete a note by its ID and notify other tabs.
  */
 export async function deleteNote(id) {
   if (!id) return false;
@@ -258,7 +488,10 @@ export async function deleteNote(id) {
     const store = tx.objectStore(STORE_NOTES);
     store.delete(id);
 
-    tx.oncomplete = () => resolve(true);
+    tx.oncomplete = () => {
+      broadcastSyncEvent({ type: 'NOTE_DELETED', noteId: id });
+      resolve(true);
+    };
     tx.onerror = (event) => reject(new Error(`deleteNote failed: ${event.target.error?.message}`));
     tx.onabort = (event) => reject(new Error(`deleteNote transaction aborted: ${event.target.error?.message}`));
   });
@@ -275,7 +508,10 @@ export async function clearAllNotes() {
     const store = tx.objectStore(STORE_NOTES);
     store.clear();
 
-    tx.oncomplete = () => resolve(true);
+    tx.oncomplete = () => {
+      broadcastSyncEvent({ type: 'NOTES_RESET' });
+      resolve(true);
+    };
     tx.onerror = (event) => reject(new Error(`clearAllNotes failed: ${event.target.error?.message}`));
   });
 }
@@ -375,16 +611,17 @@ export async function exportDatabase() {
 }
 
 /**
- * Safe LocalStorage Migration Service
+ * Safe LocalStorage Migration Service with Deep Field-by-Field Integrity Verification
  * 
  * Guarantees zero data loss:
- * 1. Checks if migration has already been completed.
+ * 1. Checks if migration has already been completed (idempotency check).
  * 2. Reads legacy 'lexinote_notes_v4' from localStorage.
- * 3. Creates an immutable backup in localStorage ('lexinote_notes_v4_backup') AND meta store ('localStorage_backup_v4').
- * 4. Atomically writes all notes into IndexedDB 'notes' store.
- * 5. Verifies that every note was successfully stored by ID and count.
- * 6. Records migration completion in 'meta' store.
- * 7. Leaves original 'lexinote_notes_v4' intact as a secondary fallback.
+ * 3. Inspects duplicate IDs or malformed records.
+ * 4. Creates an immutable backup in localStorage ('lexinote_notes_v4_backup') AND meta store ('localStorage_backup_v4').
+ * 5. Atomically writes all notes into IndexedDB 'notes' store.
+ * 6. Executes deep verification comparing every expected persisted field against the retrieved record.
+ * 7. If and only if 100% of notes pass verification, records migration completion in 'meta'.
+ * 8. Retains original 'lexinote_notes_v4' intact as secondary offline recovery fallback.
  */
 export async function migrateFromLocalStorage(storageObj = null) {
   // Check migration status in IndexedDB
@@ -428,7 +665,7 @@ export async function migrateFromLocalStorage(storageObj = null) {
   try {
     parsedNotes = JSON.parse(raw);
   } catch (err) {
-    // Corrupted legacy storage: do NOT wipe, create emergency raw backup and return warning
+    // Corrupted legacy storage: do NOT wipe, create emergency raw backup and return error
     storage.setItem('lexinote_notes_v4_corrupted_backup', raw);
     await setMeta('migration_v4_error', {
       error: 'Corrupted JSON in localStorage',
@@ -447,6 +684,18 @@ export async function migrateFromLocalStorage(storageObj = null) {
     return { migrated: false, reason: 'empty_array', noteCount: 0 };
   }
 
+  // Pre-Migration Check: Detect Duplicate Note IDs
+  const seenIds = new Set();
+  for (const n of parsedNotes) {
+    if (!n || !n.id) {
+      throw new Error('Migration verification failed: Legacy note record is missing an "id" field!');
+    }
+    if (seenIds.has(n.id)) {
+      throw new Error(`Migration verification failed: Duplicate note ID "${n.id}" detected in legacy source data!`);
+    }
+    seenIds.add(n.id);
+  }
+
   // 1. Create Pre-Migration Backups (both in localStorage and in IndexedDB meta)
   try {
     storage.setItem('lexinote_notes_v4_backup', raw);
@@ -463,21 +712,19 @@ export async function migrateFromLocalStorage(storageObj = null) {
   // 2. Batch Save all notes to IndexedDB
   await saveNotesBatch(parsedNotes);
 
-  // 3. Rigorous Verification Phase
+  // 3. Deep Verification Phase
   const verifiedCount = await countNotes();
-  const missingNotes = [];
-
-  for (const n of parsedNotes) {
-    if (n && n.id) {
-      const retrieved = await getNote(n.id);
-      if (!retrieved) {
-        missingNotes.push(n.id);
-      }
-    }
+  if (verifiedCount < parsedNotes.length) {
+    throw new Error(`Migration count mismatch: Expected at least ${parsedNotes.length} notes, found ${verifiedCount} in database.`);
   }
 
-  if (missingNotes.length > 0) {
-    throw new Error(`Migration verification failed: ${missingNotes.length} notes missing in IndexedDB! IDs: ${missingNotes.slice(0, 5).join(', ')}`);
+  for (const n of parsedNotes) {
+    const retrieved = await getNote(n.id);
+    if (!retrieved) {
+      throw new Error(`Migration verification failed: Note "${n.id}" missing from IndexedDB!`);
+    }
+    // Deep field-by-field verification
+    deepVerifyMigratedNote(n, retrieved);
   }
 
   // 4. Mark migration as successfully complete

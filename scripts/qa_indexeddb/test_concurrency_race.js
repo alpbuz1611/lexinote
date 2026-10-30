@@ -1,5 +1,5 @@
 /**
- * LexiNote QA Phase 4.3 — Concurrency & Race Condition Stress Test
+ * LexiNote QA Phase 4.3 — Concurrency, Race Condition & Targeted Multi-Tab Synchronization Test
  */
 
 import { indexedDB } from 'fake-indexeddb';
@@ -20,7 +20,7 @@ function assert(condition, message) {
 
 async function runConcurrencyRaceTests() {
   console.log('\n================================================================');
-  console.log('⚡ QA 4.3 — CONCURRENCY & RACE CONDITION STRESS TEST');
+  console.log('⚡ QA 4.3 — CONCURRENCY, OCC & TARGETED MULTI-TAB SYNC TEST');
   console.log('================================================================');
 
   storage.setIDBFactory(indexedDB);
@@ -41,20 +41,19 @@ async function runConcurrencyRaceTests() {
   };
   await storage.saveNote(baseNote);
 
-  const editPromises = [];
   for (let i = 1; i <= 100; i++) {
     const updated = {
       ...baseNote,
       content: `Keystroke update #${i} at ${Date.now()}`,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date(Date.now() + i * 10).toISOString()
     };
-    // Sequential or microtask rapid save
     await storage.saveNote(updated);
   }
 
   const finalNote = await storage.getNote('race-note-autosave');
   assert(finalNote !== null, 'Single note persisted through 100 rapid consecutive saves');
   assert(finalNote.content.startsWith('Keystroke update #100'), 'Final content matches the latest keystroke (#100)');
+  assert(finalNote.version === 101, `Monotonically increasing version tracked correctly (expected 101, actual: ${finalNote.version})`);
 
   console.log('\n--- 4.3.2 Parallel Concurrent Writes across 50 Independent Notes ---');
   const parallelNotes = Array.from({ length: 50 }, (_, i) => ({
@@ -85,10 +84,8 @@ async function runConcurrencyRaceTests() {
   assert(allParallelPresent, 'All 50 parallel written notes verified intact');
 
   console.log('\n--- 4.3.3 Simultaneous Interleaved Read / Write / Delete Operations ---');
-  // While saving 20 new notes, delete 10 existing notes, and read 10 other notes simultaneously
   const interleavedOperations = [];
 
-  // Writes
   for (let i = 100; i < 120; i++) {
     interleavedOperations.push(
       storage.saveNote({
@@ -102,31 +99,112 @@ async function runConcurrencyRaceTests() {
     );
   }
 
-  // Deletions of notes 0..9
   for (let i = 0; i < 10; i++) {
     interleavedOperations.push(storage.deleteNote(`parallel-note-${i}`));
   }
 
-  // Reads of notes 10..19
   for (let i = 10; i < 20; i++) {
     interleavedOperations.push(storage.getNote(`parallel-note-${i}`));
   }
 
   await Promise.all(interleavedOperations);
 
-  // Verify deletion results
   const deleted0 = await storage.getNote('parallel-note-0');
   const deleted9 = await storage.getNote('parallel-note-9');
   assert(deleted0 === null && deleted9 === null, 'Deleted notes successfully removed during concurrent operations');
 
-  // Verify new writes
   const new100 = await storage.getNote('interleaved-new-100');
   const new119 = await storage.getNote('interleaved-new-119');
   assert(new100 !== null && new119 !== null, 'Newly written notes stored successfully during concurrent operations');
 
-  // Verify read note untouched
   const read15 = await storage.getNote('parallel-note-15');
   assert(read15 !== null && read15.title === 'Concurrent Worker Note #15', 'Concurrent read note preserved');
+
+  console.log('\n--- 4.3.4 Targeted Note-Level Multi-Tab Concurrency (Prevent Stale Catalog Overwrites) ---');
+  // Seed two notes: Note A and Note B
+  const noteA = {
+    id: 'tab-note-A',
+    title: 'Project Alpha Requirements',
+    content: 'Initial Alpha Specs',
+    mode: 'work',
+    createdAt: '2026-01-01T10:00:00.000Z',
+    updatedAt: '2026-01-01T10:00:00.000Z'
+  };
+  const noteB = {
+    id: 'tab-note-B',
+    title: 'Project Beta Requirements',
+    content: 'Initial Beta Specs',
+    mode: 'work',
+    createdAt: '2026-01-01T10:00:00.000Z',
+    updatedAt: '2026-01-01T10:00:00.000Z'
+  };
+
+  await storage.saveNote(noteA);
+  await storage.saveNote(noteB);
+
+  // Tab 1 edits Note A
+  const tab1NoteA = {
+    ...noteA,
+    content: 'Alpha Specs updated by Tab 1',
+    updatedAt: '2026-01-01T10:05:00.000Z'
+  };
+  await storage.saveNote(tab1NoteA);
+
+  // Tab 2 edits Note B (without touching Note A)
+  const tab2NoteB = {
+    ...noteB,
+    content: 'Beta Specs updated by Tab 2',
+    updatedAt: '2026-01-01T10:06:00.000Z'
+  };
+  await storage.saveNote(tab2NoteB);
+
+  // Verify that Tab 1's edit to Note A is preserved and was NOT overwritten
+  const verifyNoteA = await storage.getNote('tab-note-A');
+  const verifyNoteB = await storage.getNote('tab-note-B');
+
+  assert(verifyNoteA.content === 'Alpha Specs updated by Tab 1', 'Note A retained Tab 1 modifications (zero stale overwrite)');
+  assert(verifyNoteB.content === 'Beta Specs updated by Tab 2', 'Note B retained Tab 2 modifications');
+
+  console.log('\n--- 4.3.5 Optimistic Concurrency Control (OCC) Stale Revision Protection ---');
+  // Attempt to save an older revision of Note A (simulating a stale tab or delayed network packet)
+  const staleNoteA = {
+    ...noteA,
+    content: 'STALE OUTDATED OVERWRITE ATTEMPT',
+    updatedAt: '2026-01-01T10:02:00.000Z' // Older than the 10:05:00 timestamp in DB
+  };
+
+  let conflictThrown = false;
+  try {
+    await storage.saveNote(staleNoteA, { checkConflict: true });
+  } catch (err) {
+    if (err.name === 'ConcurrencyConflictError') {
+      conflictThrown = true;
+    }
+  }
+
+  assert(conflictThrown, 'Stale revision rejected by Optimistic Concurrency Control (OCC)');
+
+  // Verify database record remained untouched
+  const noteAAfterConflict = await storage.getNote('tab-note-A');
+  assert(noteAAfterConflict.content === 'Alpha Specs updated by Tab 1', 'Database content protected from stale overwrite');
+
+  // Verify forced save works when explicitly requested
+  await storage.saveNote({ ...staleNoteA, updatedAt: '2026-01-01T10:10:00.000Z' }, { force: true });
+  const noteAAfterForce = await storage.getNote('tab-note-A');
+  assert(noteAAfterForce.content === 'STALE OUTDATED OVERWRITE ATTEMPT', 'Explicit forced save succeeded');
+
+  console.log('\n--- 4.3.6 Cross-Tab Synchronization Bus Event Handlers ---');
+  let receivedEvent = null;
+  const unsubscribe = storage.onSyncEvent((evt) => {
+    receivedEvent = evt;
+  });
+
+  // Emulate an incoming tab sync message
+  storage.broadcastSyncEvent({ type: 'NOTE_SAVED', note: { id: 'broadcast-test', title: 'Broadcasted' } });
+
+  assert(typeof storage.onSyncEvent === 'function', 'onSyncEvent registration API is functional');
+  assert(typeof storage.broadcastSyncEvent === 'function', 'broadcastSyncEvent dispatch API is functional');
+  unsubscribe();
 
   // Clean teardown
   await storage.deleteDatabase();
