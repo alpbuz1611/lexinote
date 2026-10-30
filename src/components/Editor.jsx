@@ -643,9 +643,12 @@ export default function Editor({
     Array.from((note.content || '').matchAll(/\[\[(.*?)\]\]/g)).map(m => m[1].trim()).filter(Boolean)
   ));
 
-  const backlinks = allNotes.filter(
-    other => other.id !== note.id && (other.content || '').includes(`[[${note.title}]]`)
-  );
+  const noteTitleLower = (note.title || '').trim().toLowerCase();
+  const backlinks = allNotes.filter(other => {
+    if (other.id === note.id || !other.content || !noteTitleLower) return false;
+    const matches = Array.from(other.content.matchAll(/\[\[(.*?)\]\]/g));
+    return matches.some(m => m[1].trim().toLowerCase() === noteTitleLower);
+  });
 
   // Stats calculation
   const wordsCount = (note.content || '').trim().split(/\s+/).filter(Boolean).length;

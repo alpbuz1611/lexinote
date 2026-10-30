@@ -1,20 +1,23 @@
 import { EN_TYPO_MAP, EN_WORD_SET, EN_TO_TR_LEXICON } from '../data/dictionary_en.js';
-import { TR_TYPO_MAP, TR_WORD_SET } from '../data/dictionary_tr.js';
+import { TR_TYPO_MAP, TR_WORD_SET, TR_TO_EN_LEXICON } from '../data/dictionary_tr.js';
 import { isEnable1Word, getEnable1Set } from '../data/wordlists/enable1Loader.js';
-import { isFreedictWord } from '../data/freedict/freedictLoader.js';
+import { isFreedictWord, isTurkishFreedictWord } from '../data/freedict/freedictLoader.js';
 
 /**
  * Preserves the casing of the original word onto the replacement
  */
-export function matchCase(original, replacement) {
+export function matchCase(original, replacement, language = 'auto') {
   if (!original || !replacement) return replacement;
-  if (original === original.toUpperCase() && original.length > 1) {
-    return replacement.toUpperCase();
+  const isTr = language === 'tr' || /[çğıöşüÇĞIİÖŞÜ]/.test(original);
+  if (original === (isTr ? original.toLocaleUpperCase('tr-TR') : original.toUpperCase()) && original.length > 1) {
+    return isTr ? replacement.toLocaleUpperCase('tr-TR') : replacement.toUpperCase();
   }
-  if (original[0] === original[0].toUpperCase()) {
-    return replacement.charAt(0).toUpperCase() + replacement.slice(1).toLowerCase();
+  if (original[0] === (isTr ? original[0].toLocaleUpperCase('tr-TR') : original[0].toUpperCase())) {
+    const head = isTr ? replacement.charAt(0).toLocaleUpperCase('tr-TR') : replacement.charAt(0).toUpperCase();
+    const tail = isTr ? replacement.slice(1).toLocaleLowerCase('tr-TR') : replacement.slice(1).toLowerCase();
+    return head + tail;
   }
-  return replacement.toLowerCase();
+  return isTr ? replacement.toLocaleLowerCase('tr-TR') : replacement.toLowerCase();
 }
 
 /**
@@ -97,10 +100,15 @@ export function checkWord(word, language = 'en', customWords = []) {
     return { isValid: true, suggestions: [] };
   }
 
-  const cleanWord = word.trim().toLowerCase();
+  const trimmed = word.trim();
+  const isTr = language === 'tr' || /[çğıöşüÇĞIİÖŞÜ]/.test(trimmed);
+  const cleanWord = isTr ? trimmed.toLocaleLowerCase('tr-TR') : trimmed.toLowerCase();
 
   // 1. Check user custom dictionary
-  if (customWords.map(w => w.toLowerCase()).includes(cleanWord)) {
+  const customLowered = customWords.map(w =>
+    (isTr || /[çğıöşüÇĞIİÖŞÜ]/.test(w)) ? w.trim().toLocaleLowerCase('tr-TR') : w.trim().toLowerCase()
+  );
+  if (customLowered.includes(cleanWord)) {
     return { isValid: true, suggestions: [] };
   }
 
@@ -109,7 +117,7 @@ export function checkWord(word, language = 'en', customWords = []) {
 
   // Direct known typo hit (e.g. aborad -> abroad, yalnış -> yanlış)
   if (typoMap[cleanWord]) {
-    const fixed = matchCase(word, typoMap[cleanWord]);
+    const fixed = matchCase(word, typoMap[cleanWord], language);
     return {
       isValid: false,
       isKnownTypo: true,
@@ -120,13 +128,13 @@ export function checkWord(word, language = 'en', customWords = []) {
 
   // 3. Exact word validation against master wordlists
   if (language === 'en') {
-    // ENABLE1 (172,819 words) + FreeDict Lexicon (34,405 words)
+    // ENABLE1 (172,819 words) + FreeDict Lexicon (34,405 words) + Curated Lexicon
     if (isEnable1Word(cleanWord) || isFreedictWord(cleanWord) || EN_WORD_SET.has(cleanWord)) {
       return { isValid: true, suggestions: [] };
     }
   } else {
-    // TDK Turkish Word Set
-    if (TR_WORD_SET.has(cleanWord)) {
+    // TDK Turkish Word Set (TR_WORD_SET) + FreeDict 48k+ Reverse Index + Curated TDK Lexicon
+    if (TR_WORD_SET.has(cleanWord) || Boolean(TR_TO_EN_LEXICON[cleanWord]) || isTurkishFreedictWord(cleanWord)) {
       return { isValid: true, suggestions: [] };
     }
   }

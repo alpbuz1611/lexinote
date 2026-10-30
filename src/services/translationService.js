@@ -1,12 +1,7 @@
-import { lookupEnglishWord, lookupTurkishWord } from '../data/freedict/freedictLoader.js';
+import { lookupEnglishWord, lookupTurkishWord, cleanLookupKey } from '../data/freedict/freedictLoader.js';
 import { translateOfflinePhraseOrSentence } from './sentenceTranslationService.js';
 import { EN_TO_TR_LEXICON, DICTIONARY_SOURCE_INFO } from '../data/dictionary_en.js';
 import { TR_TO_EN_LEXICON } from '../data/dictionary_tr.js';
-
-function cleanLookupKey(str) {
-  if (!str) return '';
-  return str.trim().toLowerCase().replace(/[.,!?;:'"()[\]{}]/g, '');
-}
 
 /**
  * Enhanced Bilingual Translation & FreeDict Offline Dictionary Lookup
@@ -19,7 +14,7 @@ export function translateSelection(text, fromLang = 'en', toLang = 'tr') {
   }
 
   const query = text.trim();
-  const cleanKey = cleanLookupKey(query);
+  const cleanKey = cleanLookupKey(query, fromLang);
   const words = query.split(/\s+/).filter(Boolean);
 
   // 1. Single Word English to Turkish Lookup

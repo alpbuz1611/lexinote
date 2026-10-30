@@ -8,9 +8,12 @@ import freedictMetadata from './freedict_metadata.json' with { type: 'json' };
  * License: GNU General Public License v2.0 or later (GPL-2.0-or-later)
  */
 
-function cleanLookupKey(str) {
+export function cleanLookupKey(str, lang = 'auto') {
   if (!str) return '';
-  return str.trim().toLowerCase().replace(/[.,!?;:'"()[\]{}]/g, '');
+  const trimmed = str.trim();
+  const isTr = lang === 'tr' || /[çğıöşüÇĞIİÖŞÜ]/.test(trimmed);
+  const lowered = isTr ? trimmed.toLocaleLowerCase('tr-TR') : trimmed.toLowerCase();
+  return lowered.replace(/[.,!?;:'"()[\]{}]/g, '');
 }
 
 /**
@@ -137,7 +140,7 @@ export function lookupEnglishWord(query) {
  */
 export function lookupTurkishWord(query) {
   if (!query) return null;
-  const key = cleanLookupKey(query);
+  const key = cleanLookupKey(query, 'tr');
   const enWords = freedictTrEn[key];
 
   if (!enWords || enWords.length === 0) {
@@ -177,8 +180,17 @@ export function lookupTurkishWord(query) {
  */
 export function isFreedictWord(word) {
   if (!word) return false;
-  const key = cleanLookupKey(word);
+  const key = cleanLookupKey(word, 'en');
   return Boolean(freedictEnTr[key]);
+}
+
+/**
+ * Checks whether a Turkish word exists in FreeDict reverse index
+ */
+export function isTurkishFreedictWord(word) {
+  if (!word) return false;
+  const key = cleanLookupKey(word, 'tr');
+  return Boolean(freedictTrEn[key]);
 }
 
 /**

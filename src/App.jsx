@@ -14,6 +14,7 @@ import { DEFAULT_NOTES, getDefaultNotes, DEFAULT_NOTES_EN, DEFAULT_NOTES_TR, isD
 import { sound } from './services/soundService.js';
 import { encryptData, decryptData } from './services/cryptoService.js';
 import { getTranslation } from './i18n/translations.js';
+import * as storageService from './services/storageService.js';
 
 export default function App() {
   // 0. Application Language State (100% English by Default, with Setup Selection)
@@ -187,12 +188,51 @@ export default function App() {
     sound.playPop();
   };
 
-  // Persist Notes
+  // Primary Storage Initialization & LocalStorage Migration to IndexedDB
   useEffect(() => {
+    let isMounted = true;
+    async function initStorage() {
+      try {
+        await storageService.initDB();
+        const migration = await storageService.migrateFromLocalStorage();
+        if (migration.migrated) {
+          console.log(`[LexiNote Storage] Successfully migrated ${migration.noteCount} notes to IndexedDB.`);
+        }
+        const dbNotes = await storageService.getAllNotes();
+        if (isMounted && Array.isArray(dbNotes) && dbNotes.length > 0) {
+          setNotes(dbNotes);
+          setActiveNoteId(prev => (prev && dbNotes.some(n => n.id === prev)) ? prev : dbNotes[0].id);
+        } else if (isMounted && (!dbNotes || dbNotes.length === 0)) {
+          // If IndexedDB is empty, seed it with current notes
+          await storageService.saveNotesBatch(notes);
+        }
+      } catch (err) {
+        console.error('[LexiNote Storage] IndexedDB initialization failed:', err);
+      }
+    }
+    initStorage();
+    return () => { isMounted = false; };
+  }, []);
+
+  // Persist Notes (Primary: IndexedDB, Fallback: Sanitized localStorage)
+  useEffect(() => {
+    if (!notes || notes.length === 0) return;
+
+    // 1. Asynchronously persist to IndexedDB
+    storageService.saveNotesBatch(notes).catch(err => {
+      console.error('[LexiNote Storage] IndexedDB batch save failed:', err);
+    });
+
+    // 2. Synchronous fallback write to localStorage (sanitized)
     try {
-      localStorage.setItem('lexinote_notes_v4', JSON.stringify(notes));
+      const sanitized = notes.map(n => storageService.sanitizeNote(n));
+      localStorage.setItem('lexinote_notes_v4', JSON.stringify(sanitized));
     } catch (e) {
-      console.error(e);
+      if (e?.name === 'QuotaExceededError') {
+        console.warn('Storage quota exceeded in localStorage fallback; notes safely preserved in IndexedDB.', e);
+      } else {
+        console.error('Failed to save notes to storage:', e);
+      }
     }
   }, [notes]);
 
@@ -237,9 +277,12 @@ export default function App() {
     const isWork = mode === 'work';
     const isJournal = mode === 'journal';
     const isEn = appLanguage === 'en';
+    const uniqueId = typeof crypto !== 'undefined' && crypto.randomUUID
+      ? `note-${crypto.randomUUID()}`
+      : `note-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
     const newNote = {
-      id: `note-${Date.now()}`,
+      id: uniqueId,
       mode,
       title: isWork
         ? (isEn ? 'New Project Deliverable' : 'Yeni İş & Proje Notu')
@@ -278,12 +321,34 @@ export default function App() {
   };
 
   const handleUpdateNote = (updatedNote) => {
-    setNotes(notes.map(n => (n.id === updatedNote.id ? updatedNote : n)));
+    // If updating an unlocked encrypted note, keep encryptedData up to date in the background
+    if (updatedNote.isLocked && updatedNote._tempUnlocked && updatedNote._activePin) {
+      encryptData(
+        {
+          content: updatedNote.content || '',
+          todos: updatedNote.todos || [],
+          gratitude: updatedNote.gratitude || []
+        },
+        updatedNote._activePin
+      ).then(freshEncrypted => {
+        setNotes(prev =>
+          prev.map(n =>
+            n.id === updatedNote.id ? { ...updatedNote, encryptedData: freshEncrypted } : n
+          )
+        );
+      }).catch(err => {
+        console.error('Auto-re-encryption on edit failed:', err);
+      });
+    }
+    setNotes(prev => prev.map(n => (n.id === updatedNote.id ? updatedNote : n)));
   };
 
   const handleDeleteNote = (noteId) => {
     const confirmMsg = t.editor?.deleteConfirm || t.sidebar?.deleteConfirm || 'Are you sure you want to delete this note?';
     if (confirm(confirmMsg)) {
+      storageService.deleteNote(noteId).catch(err => {
+        console.error('[LexiNote Storage] Failed to delete note from IndexedDB:', err);
+      });
       let remaining = notes.filter(n => n.id !== noteId);
       // If user deleted the last note, automatically generate a clean blank note so app is never in a dead state
       if (remaining.length === 0) {
@@ -302,6 +367,11 @@ export default function App() {
     const confirmMsg = t.settings?.clearStarterNotesConfirm || (appLanguage === 'en' ? 'Remove all starter notes and open a clean blank note?' : 'Tüm örnek notları silip temiz ve boş bir sayfayla başlamak istiyor musunuz?');
     if (confirm(confirmMsg)) {
       const blank = [createInitialBlankNote(appLanguage)];
+      storageService.clearAllNotes().then(() => {
+        return storageService.saveNotesBatch(blank);
+      }).catch(err => {
+        console.error('[LexiNote Storage] Failed to clear and reset IndexedDB:', err);
+      });
       setNotes(blank);
       setActiveNoteId(blank[0].id);
       localStorage.setItem('lexinote_notes_v4', JSON.stringify(blank));
@@ -322,7 +392,11 @@ export default function App() {
     const target = notes.find(n => n.id === noteId);
     if (!target) return;
 
-    const effectivePin = pin || target._activePin || '1234';
+    const effectivePin = pin || target._activePin;
+    if (!effectivePin) {
+      console.warn('Cannot lock note: No valid PIN available.');
+      return;
+    }
     const payload = {
       content: target.content || '',
       todos: target.todos || [],

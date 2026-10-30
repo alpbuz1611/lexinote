@@ -370,15 +370,20 @@ export const getDefaultNotes = (lang = 'en') => {
 
 export const isDefaultNotesList = (notesList) => {
   if (!Array.isArray(notesList) || notesList.length === 0) return true;
-  const defaultIds = new Set([
-    'note-work-1',
-    'note-work-2',
-    'note-plain-1',
-    'note-journal-1',
-    'note-work-3',
-    'note-locked-demo'
-  ]);
-  return notesList.every(n => defaultIds.has(n.id));
+
+  const checkAgainst = (defaults) => {
+    if (notesList.length !== defaults.length) return false;
+    for (let i = 0; i < defaults.length; i++) {
+      const actual = notesList.find(n => n.id === defaults[i].id);
+      if (!actual) return false;
+      // If user modified title, content, or customized the starter note, it is NOT untouched
+      if (actual.title !== defaults[i].title) return false;
+      if (actual.content !== defaults[i].content) return false;
+    }
+    return true;
+  };
+
+  return checkAgainst(DEFAULT_NOTES_EN) || checkAgainst(DEFAULT_NOTES_TR);
 };
 
 export const DEFAULT_NOTES = DEFAULT_NOTES_EN;

@@ -25,13 +25,13 @@
 - [2. Note Architectures & Design Themes](#2-note-architectures--design-themes)
 - [3. Deep Space Mind Map & Freeform Studio](#3-deep-space-mind-map--freeform-studio)
 - [4. 100% Offline Dictionaries & Spellchecking](#4-100-offline-dictionaries--spellchecking)
-- [5. Military-Grade AES-256 GCM Local Vault](#5-military-grade-aes-256-gcm-local-vault)
+- [5. Cryptographically Secure PBKDF2 & AES-256-GCM Local Vault](#5-cryptographically-secure-pbkdf2--aes-256-gcm-local-vault)
 - [6. Technology Stack & Architecture](#6-technology-stack--architecture)
 - [7. Quickstart & Installation](#7-quickstart--installation)
 - [8. Windows 11 Desktop Installation (.exe & PWA)](#8-windows-11-desktop-installation-exe--pwa)
 - [9. macOS Desktop Installation (.dmg & .zip)](#9-macos-desktop-installation-dmg--zip)
 - [10. Mobile Installation (Android APK)](#10-mobile-installation-android-apk)
-- [11. Release Verification Suite (37/37 Tests)](#11-release-verification-suite-3737-tests)
+- [11. Comprehensive Quality Assurance & Testing Suite (268 Tests)](#11-comprehensive-quality-assurance--testing-suite-268-tests)
 - [12. Legal Attributions & Licenses](#12-legal-attributions--licenses)
 
 ---
@@ -113,22 +113,23 @@ Highlight any word in the editor to instantly bring up a sleek dark bubble displ
 
 ---
 
-## 5. Military-Grade AES-256 GCM Local Vault
+## 5. Cryptographically Secure PBKDF2 & AES-256-GCM Local Vault
 
-Protect sensitive thoughts and corporate credentials with hardware-accelerated Web Crypto APIs:
+Protect sensitive thoughts and personal credentials with native, hardware-accelerated Web Crypto APIs:
 
 - **Key Derivation:** PBKDF2 with SHA-256 and **100,000 iterations** for brute-force resistance.
-- **Cipher:** AES-GCM 256-bit with unique 96-bit initialization vectors (IV) and cryptographic salts per save.
-- **Tamper-Evident:** Any modification to ciphertext or unauthorized PIN attempt immediately fails authentication without leaking plaintext.
-- **Zero Cloud Exposure:** Plaintext never touches disk in decrypted state when locked.
+- **Cipher:** AES-GCM 256-bit with unique 96-bit initialization vectors (IV) and cryptographic salts generated per save.
+- **Tamper-Evident:** Any modification to ciphertext or unauthorized PIN attempt immediately fails authentication via GCM authentication tag validation without leaking plaintext.
+- **Zero Cloud Exposure & Disk Sanitization:** Plaintext, todos, and runtime PIN codes are strictly purged from both IndexedDB and disk storage prior to serialization.
 
 ---
 
 ## 6. Technology Stack & Architecture
 
 - **Frontend Framework:** [React 19](https://react.dev/) + [Vite 6](https://vitejs.dev/)
+- **Primary Storage Engine:** Native Asynchronous **IndexedDB** (`lexinote_db`, v1) with non-destructive fallback to `localStorage`
 - **Styling Engine:** [Tailwind CSS v4](https://tailwindcss.com/) with native CSS variables and `@theme` tokens
-- **Desktop Packaging:** [Electron](https://www.electronjs.org/) + [Electron Builder](https://www.electron.build/) (.exe Setup & Portable)
+- **Desktop Packaging:** [Electron](https://www.electronjs.org/) + [Electron Builder](https://www.electron.build/) (.exe Setup & Portable, .dmg & .zip for macOS)
 - **Canvas Rendering:** HTML5 Canvas 2D Context with custom parallax physics and mathematical Bezier routing
 - **Cryptography:** Native browser Web Crypto Subsystem (`crypto.subtle`)
 - **Iconography:** [Lucide Icons](https://lucide.dev/)
@@ -214,52 +215,43 @@ Install the standalone Android APK directly to your mobile device:
 2. Open the downloaded `.apk` file on your Android phone.
 3. Tap **Install** and enjoy LexiNote completely offline on your smartphone or tablet!
 
+> ⚠️ **Hardware Compatibility Disclosure:** While Capacitor Android builds and packaging pass automated compilation, physical device touch/gesture interactions on specific hardware (e.g., Samsung Galaxy S24 Ultra) are currently classified as **NOT TESTED** in physical laboratory conditions until dedicated mobile release validation.
+
 ---
 
-## 11. Release Verification Suite (37/37 Tests)
+## 11. Comprehensive Quality Assurance & Testing Suite (268 Tests)
 
-LexiNote includes an end-to-end automated verification script covering all core engines:
+LexiNote features an exhaustive automated test harness covering data persistence, cryptographic privacy, editor modes, offline dictionaries, mindmap graph physics, and IndexedDB scale stress testing:
 
 ```bash
-node scripts/verify_e2e_release.js
+# Run the complete master test suite (268 automated tests)
+npm test
 ```
 
-### Test Suite Output
+The master test suite executes:
+1. **v0.1.0 Master QA Audit:** 148 automated tests (`scripts/qa_audit/run_all_audits.js`)
+2. **IndexedDB Scale & Stress Suite:** 83 automated tests (`scripts/qa_indexeddb/run_all_indexeddb_tests.js`)
+3. **E2E Release Readiness & Lexicon Suite:** 37 automated tests (`scripts/verify_e2e_release.js`)
+
+For detailed benchmark timings, 1,000-note scale evaluations, 100,000-word document tests, and failure recovery protocols, see the official [📄 Comprehensive QA Report](docs/QA_REPORT.md).
+
+### Summary of Test Execution
 ```text
-================================================================
-🚀 LEXINOTE v1.0.0 RELEASE READINESS VERIFICATION SUITE
-================================================================
-
---- 1. FreeDict Dictionary Scope & Headwords ---
-  ✅ [PASS] 34k+ English headwords verified (Actual: 34,405)
-  ✅ [PASS] 48k+ Turkish reverse index verified (Actual: 48,294)
-  ✅ [PASS] "abroad", "computer", "hospital", "mountain", "freedom", etc. verified
-
---- 2. Polysemy & TEI Sense Groups ---
-  ✅ [PASS] "book" correctly categorized as polysemous (13 sense groups)
-  ✅ [PASS] "work" correctly categorized as polysemous (33 sense groups)
-  ✅ [PASS] "school" correctly categorized as polysemous (12 sense groups)
-  ✅ [PASS] "accommodate" correctly categorized as polysemous (5 sense groups)
-
---- 3. Natural Sentence Syntactic Translation Engine ---
-  ✅ [PASS] SVO to SOV rule resolution verified
-
---- 4. ENABLE1 Spellcheck & Correction ---
-  ✅ [PASS] 'aborad' typo detected
-  ✅ [PASS] getAutoCorrection('aborad') ➔ 'abroad' suggested
-  ✅ [PASS] Correct words preserved with zero false-positives
-
---- 5. Security: PBKDF2 & AES-256 GCM Cryptography ---
-  ✅ [PASS] Encrypted package generated without plaintext leakage
-  ✅ [PASS] Correct PIN recovers content and checklist intact
-  ✅ [PASS] Wrong PIN rejected via Auth Tag Mismatch
-
---- 6. Freeform Mindset Studio Hierarchy ---
-  ✅ [PASS] Cambridge ➔ Cambridge University ➔ Raspberry Pi ➔ Affordable Computers ($25)
-
-================================================================
-📊 RESULT: 37 / 37 TESTS PASSED (100%)
-================================================================
+################################################################
+🛡️  LEXINOTE MASTER QUALITY ASSURANCE & VERIFICATION SUITE
+################################################################
+Phase 1: Persistence & Data Integrity      :  16 Passed, 0 Failed
+Phase 2: Security & Cryptographic Audit    :  17 Passed, 0 Failed
+Phase 3: Rich Text Editor & Multi-Mode     :  33 Passed, 0 Failed
+Phase 4: Offline Dictionaries & Spellcheck :  19 Passed, 0 Failed
+Phase 5: WikiLinks, Graph & Mindmap Studio :  48 Passed, 0 Failed
+Phase 6: Cross-Platform Packaging Paths    :  10 Passed, 0 Failed
+Phase 7: Performance & Latency Benchmarks  :   5 Passed, 0 Failed
+Phase 8: IndexedDB Engine & Stress/Scale   :  83 Passed, 0 Failed
+Phase 9: E2E Release Readiness & Lexicon   :  37 Passed, 0 Failed
+----------------------------------------------------------------
+TOTAL: 268 PASSED, 0 FAILED (100.0% SUCCESS RATE)
+################################################################
 ```
 
 ---

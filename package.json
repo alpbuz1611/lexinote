@@ -11,6 +11,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "desktop": "electron electron/main.cjs",
+    "test": "node scripts/qa_audit/run_all_audits.js && node scripts/qa_indexeddb/run_all_indexeddb_tests.js && node scripts/verify_e2e_release.js",
     "build:win": "vite build && electron-builder --win",
     "build:mac": "vite build && electron-builder --mac"
   },
@@ -24,6 +25,7 @@
     "@vitejs/plugin-react": "^4.3.4",
     "electron": "^45.1.0",
     "electron-builder": "^26.18.0",
+    "fake-indexeddb": "^6.2.7",
     "tailwindcss": "^4.3.3",
     "vite": "^6.2.0"
   },

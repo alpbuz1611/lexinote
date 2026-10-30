@@ -427,6 +427,76 @@ export const TR_TO_EN_LEXICON = {
     tdk: "Yapılan bir iyiliğe veya desteğe karşı duyulan gönül borcunu söz veya davranışla belirtme.",
     source: "TDK Güncel Türkçe Sözlük",
     examples: ["Değerli katkılarınız için çok teşekkür ederim. → Thank you very much for your valuable contributions."]
+  },
+  bilgisayar: {
+    en: "computer",
+    pos: "isim",
+    tdk: "Çok sayıda aritmetiksel veya mantıksal işlemlerden oluşan bir işi önceden verilmiş bir programa göre yapıp sonuçlandıran elektronik araç.",
+    source: "TDK Güncel Türkçe Sözlük",
+    examples: ["Bilgisayar mühendisliği modern bilişim çağının temelidir. → Computer engineering is the foundation of the modern computing era."]
+  },
+  geliştirme: {
+    en: "development / enhancement",
+    pos: "isim",
+    tdk: "Geliştirmek işi, inkişaf ettirme, tekâmül, ilerletme.",
+    source: "TDK Güncel Türkçe Sözlük",
+    examples: ["Yazılım geliştirme süreci başarıyla devam ediyor. → The software development process continues successfully."]
+  },
+  öğretmen: {
+    en: "teacher / instructor / educator",
+    pos: "isim",
+    tdk: "Mesleği bilgi öğretmek olan kimse, muallim.",
+    source: "TDK Güncel Türkçe Sözlük",
+    examples: ["Öğretmenimiz dersi ilgiyle anlattı. → Our teacher explained the lesson with enthusiasm."]
+  },
+  çalışmak: {
+    en: "to work / to study / to strive",
+    pos: "fiil",
+    tdk: "Bir iş üzerinde emek harcamak, çaba göstermek, faaliyette bulunmak.",
+    source: "TDK Güncel Türkçe Sözlük",
+    examples: ["Geleceğimiz için azimle çalışmalıyız. → We must strive with determination for our future."]
+  },
+  güvenlik: {
+    en: "security / safety",
+    pos: "isim",
+    tdk: "Toplum yaşamında yasal düzenin aksamadan yürütülmesi, emniyet.",
+    source: "TDK Güncel Türkçe Sözlük",
+    examples: ["Veri güvenliği ve yerel gizlilik önceliğimizdir. → Data security and local privacy are our priority."]
+  },
+  araştırma: {
+    en: "research / investigation / inquiry",
+    pos: "isim",
+    tdk: "Bilim ve sanatta bir gerçeği ortaya çıkarmak için yapılan inceleme ve tetkik.",
+    source: "TDK Güncel Türkçe Sözlük",
+    examples: ["Kapsamlı bir araştırma raporu hazırladık. → We prepared a comprehensive research report."]
+  },
+  düşünce: {
+    en: "thought / idea / reflection",
+    pos: "isim",
+    tdk: "Zihnin belirli bir konuyu anlama, kavrama ve tartma yetisiyle ürettiği fikir, mütalaa.",
+    source: "TDK Güncel Türkçe Sözlük",
+    examples: ["Özgür düşünce bilimin temel taşıdır. → Free thought is the cornerstone of science."]
+  },
+  uygulama: {
+    en: "application / practice / implementation",
+    pos: "isim",
+    tdk: "Kuramsal bir bilgiyi eyleme dönüştürme, tatbikat; bilgisayar yazılımı (app).",
+    source: "TDK Güncel Türkçe Sözlük",
+    examples: ["Yeni mobil uygulama kullanıcı deneyimini zenginleştiriyor. → The new mobile application enriches the user experience."]
+  },
+  ışık: {
+    en: "light / illumination",
+    pos: "isim",
+    tdk: "Cisimleri görmeyi, renkleri ayırt etmeyi sağlayan fiziksel enerji; aydınlık.",
+    source: "TDK Güncel Türkçe Sözlük",
+    examples: ["Sabahın ilk ışıkları odaya doldu. → The first light of morning filled the room."]
+  },
+  istanbul: {
+    en: "Istanbul",
+    pos: "özel isim",
+    tdk: "Türkiye'nin en kalabalık ve tarihi metropol şehri.",
+    source: "TDK Güncel Türkçe Sözlük",
+    examples: ["İstanbul iki kıtayı birbirine bağlar. → Istanbul connects two continents."]
   }
 };
 

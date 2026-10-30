@@ -227,6 +227,15 @@ export const EN_TO_TR_LEXICON = {
     desc: "A condition connected to an event.",
     examples: ["Under changing circumstances."]
   },
+  "computer": {
+    tr: "bilgisayar",
+    pos: "noun",
+    cefr: "A1",
+    ipa: "/kəmˈpjuːtər/",
+    source: "Oxford & Cambridge A1",
+    desc: "An electronic device for storing and processing data.",
+    examples: ["I use my computer for software development every day. → Her gün yazılım geliştirme için bilgisayarımı kullanıyorum."]
+  },
   "consequence": {
     tr: "sonuç / netice",
     pos: "noun",
