@@ -304,13 +304,13 @@ export default function Sidebar({
                       )}
                     </div>
 
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-1 opacity-80 sm:opacity-0 sm:group-hover:opacity-100 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={e => {
                           e.stopPropagation();
                           onTogglePin(note.id);
                         }}
-                        className={`p-1 rounded hover:bg-[var(--bg-surface)] cursor-pointer ${
+                        className={`p-1.5 rounded hover:bg-[var(--bg-surface)] cursor-pointer ${
                           note.isPinned ? 'text-[var(--accent)] opacity-100' : 'text-[var(--text-muted)]'
                         }`}
                         title={note.isPinned ? t.sidebar.unpinned : t.sidebar.pinned}
@@ -322,7 +322,7 @@ export default function Sidebar({
                           e.stopPropagation();
                           onDeleteNote(note.id);
                         }}
-                        className="p-1 rounded text-[var(--text-muted)] hover:text-rose-500 cursor-pointer"
+                        className="p-1.5 rounded text-rose-500/80 sm:text-[var(--text-muted)] hover:text-rose-600 active:text-rose-600 cursor-pointer"
                         title={t.common.delete}
                       >
                         <Trash2 className="w-3.5 h-3.5" />

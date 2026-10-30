@@ -10,7 +10,7 @@ import TranslationModal from './components/TranslationModal.jsx';
 import MindmapView from './components/MindmapView.jsx';
 import LanguageSetupModal from './components/LanguageSetupModal.jsx';
 import HelpGuideModal from './components/HelpGuideModal.jsx';
-import { DEFAULT_NOTES, getDefaultNotes, DEFAULT_NOTES_EN, DEFAULT_NOTES_TR, isDefaultNotesList } from './data/defaultNotes.js';
+import { DEFAULT_NOTES, getDefaultNotes, DEFAULT_NOTES_EN, DEFAULT_NOTES_TR, isDefaultNotesList, createInitialBlankNote } from './data/defaultNotes.js';
 import { sound } from './services/soundService.js';
 import { encryptData, decryptData } from './services/cryptoService.js';
 import { getTranslation } from './i18n/translations.js';
@@ -31,13 +31,14 @@ export default function App() {
   const [notes, setNotes] = useState(() => {
     const curLang = localStorage.getItem('lexinote_app_language') || 'en';
     const notesLang = localStorage.getItem('lexinote_notes_language');
+    const loadSamplePref = localStorage.getItem('lexinote_load_sample_notes');
     try {
       const saved = localStorage.getItem('lexinote_notes_v4');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
           // If notes are default notes and language doesn't match active language, auto-sync to active language
-          if (isDefaultNotesList(parsed) && notesLang !== curLang) {
+          if (isDefaultNotesList(parsed) && notesLang !== curLang && loadSamplePref !== 'false') {
             const fresh = getDefaultNotes(curLang);
             localStorage.setItem('lexinote_notes_v4', JSON.stringify(fresh));
             localStorage.setItem('lexinote_notes_language', curLang);
@@ -48,6 +49,12 @@ export default function App() {
       }
     } catch (e) {
       console.error('Failed to load notes from localStorage', e);
+    }
+    if (loadSamplePref === 'false') {
+      const blank = [createInitialBlankNote(curLang)];
+      localStorage.setItem('lexinote_notes_v4', JSON.stringify(blank));
+      localStorage.setItem('lexinote_notes_language', curLang);
+      return blank;
     }
     const fresh = getDefaultNotes(curLang);
     localStorage.setItem('lexinote_notes_language', curLang);
@@ -292,12 +299,31 @@ export default function App() {
   };
 
   const handleDeleteNote = (noteId) => {
-    if (confirm(t.sidebar.deleteConfirm)) {
-      const remaining = notes.filter(n => n.id !== noteId);
+    const confirmMsg = t.editor?.deleteConfirm || t.sidebar?.deleteConfirm || 'Are you sure you want to delete this note?';
+    if (confirm(confirmMsg)) {
+      let remaining = notes.filter(n => n.id !== noteId);
+      // If user deleted the last note, automatically generate a clean blank note so app is never in a dead state
+      if (remaining.length === 0) {
+        const fresh = createInitialBlankNote(appLanguage);
+        remaining = [fresh];
+      }
       setNotes(remaining);
-      if (activeNoteId === noteId) {
+      if (activeNoteId === noteId || !remaining.some(n => n.id === activeNoteId)) {
         setActiveNoteId(remaining[0]?.id || null);
       }
+      sound.playPop();
+    }
+  };
+
+  const handleClearAllStarterNotes = () => {
+    const confirmMsg = t.settings?.clearStarterNotesConfirm || (appLanguage === 'en' ? 'Remove all starter notes and open a clean blank note?' : 'Tüm örnek notları silip temiz ve boş bir sayfayla başlamak istiyor musunuz?');
+    if (confirm(confirmMsg)) {
+      const blank = [createInitialBlankNote(appLanguage)];
+      setNotes(blank);
+      setActiveNoteId(blank[0].id);
+      localStorage.setItem('lexinote_notes_v4', JSON.stringify(blank));
+      localStorage.setItem('lexinote_load_sample_notes', 'false');
+      sound.playPop();
     }
   };
 
@@ -493,6 +519,7 @@ export default function App() {
             allNotes={notes}
             onSelectNote={handleSelectNote}
             onUpdateNote={handleUpdateNote}
+            onDeleteNote={handleDeleteNote}
             onLockNote={handleLockNote}
             onUnlockNote={handleUnlockNote}
             spellCheckEnabled={spellCheckEnabled}
@@ -540,13 +567,15 @@ export default function App() {
       {/* First-Launch Language Setup Modal */}
       <LanguageSetupModal
         isOpen={isLanguageSetupOpen}
-        onSelectLanguage={(lang) => {
+        onSelectLanguage={(lang, loadSampleNotes = true) => {
           setAppLanguage(lang);
           localStorage.setItem('lexinote_app_language', lang);
-          const langNotes = getDefaultNotes(lang);
+          localStorage.setItem('lexinote_load_sample_notes', loadSampleNotes ? 'true' : 'false');
+          const langNotes = loadSampleNotes ? getDefaultNotes(lang) : [createInitialBlankNote(lang)];
           setNotes(langNotes);
           setActiveNoteId(langNotes[0]?.id || null);
           localStorage.setItem('lexinote_notes_v4', JSON.stringify(langNotes));
+          localStorage.setItem('lexinote_notes_language', lang);
           setIsLanguageSetupOpen(false);
         }}
       />
@@ -615,6 +644,7 @@ export default function App() {
         onExportNotes={handleExportNotes}
         onResetDefaults={handleResetDefaults}
         onReloadStarterNotes={handleReloadStarterNotes}
+        onClearAllStarterNotes={handleClearAllStarterNotes}
         appLanguage={appLanguage}
         setAppLanguage={handleSetAppLanguage}
       />

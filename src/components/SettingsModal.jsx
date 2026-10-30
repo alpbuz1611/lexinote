@@ -43,10 +43,12 @@ export default function SettingsModal({
   onExportNotes,
   onResetDefaults,
   onReloadStarterNotes,
+  onClearAllStarterNotes,
   appLanguage = 'en',
   setAppLanguage
 }) {
   const [reloadSuccess, setReloadSuccess] = useState(false);
+  const [clearSuccess, setClearSuccess] = useState(false);
   if (!isOpen) return null;
 
   const t = getTranslation(appLanguage);
@@ -117,32 +119,59 @@ export default function SettingsModal({
               </div>
             </div>
 
-            {/* Quick Reload Starter Notes Button */}
+            {/* Quick Manage Starter Notes Buttons */}
             <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-[var(--bg-surface)]/60 p-2.5 rounded-xl border border-[var(--border-color)]">
               <span className="text-[11px] text-[var(--text-muted)] leading-tight">
-                {t.settings.reloadStarterNotesDesc}
+                {appLanguage === 'en'
+                  ? 'Manage pre-made starter notes and templates'
+                  : 'Örnek başlangıç notlarını ve şablonları yönetin'}
               </span>
-              <button
-                type="button"
-                onClick={() => {
-                  if (onReloadStarterNotes) onReloadStarterNotes();
-                  setReloadSuccess(true);
-                  setTimeout(() => setReloadSuccess(false), 2500);
-                }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[var(--bg-secondary)] hover:bg-[var(--accent-light)] text-[var(--accent)] border border-[var(--border-color)] transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
-              >
-                {reloadSuccess ? (
-                  <>
-                    <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 stroke-[3]" />
-                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">{t.settings.starterNotesReloaded}</span>
-                  </>
-                ) : (
-                  <>
-                    <RefreshCw className="w-3.5 h-3.5" />
-                    <span>{t.settings.reloadStarterNotes}</span>
-                  </>
-                )}
-              </button>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (onClearAllStarterNotes) onClearAllStarterNotes();
+                    setClearSuccess(true);
+                    setTimeout(() => setClearSuccess(false), 2500);
+                  }}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300 border border-rose-200 dark:border-rose-900/40 hover:bg-rose-100 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
+                  title={appLanguage === 'en' ? 'Delete all sample notes and start with a blank note' : 'Tüm örnek notları sil ve boş bir notla başla'}
+                >
+                  {clearSuccess ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                      <span>{appLanguage === 'en' ? 'Cleared!' : 'Temizlendi!'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span>{appLanguage === 'en' ? 'Clear Samples' : 'Örnekleri Temizle'}</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (onReloadStarterNotes) onReloadStarterNotes();
+                    setReloadSuccess(true);
+                    setTimeout(() => setReloadSuccess(false), 2500);
+                  }}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-[var(--bg-secondary)] hover:bg-[var(--accent-light)] text-[var(--accent)] border border-[var(--border-color)] transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
+                >
+                  {reloadSuccess ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 stroke-[3]" />
+                      <span className="text-emerald-600 dark:text-emerald-400 font-bold">{t.settings.starterNotesReloaded}</span>
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5" />
+                      <span>{t.settings.reloadStarterNotes}</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
 

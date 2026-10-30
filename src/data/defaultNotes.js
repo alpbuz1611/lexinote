@@ -349,6 +349,21 @@ Bağlantılı Notlar:
   }
 ];
 
+export const createInitialBlankNote = (lang = 'en') => ({
+  id: `note-${Date.now()}`,
+  mode: 'plain',
+  title: lang === 'tr' ? 'Yeni Not' : 'Untitled Document',
+  language: lang,
+  content: '',
+  tags: [],
+  isPinned: false,
+  isLocked: false,
+  encryptedData: null,
+  todos: [],
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString()
+});
+
 export const getDefaultNotes = (lang = 'en') => {
   return lang === 'tr' ? DEFAULT_NOTES_TR : DEFAULT_NOTES_EN;
 };

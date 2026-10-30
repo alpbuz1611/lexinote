@@ -112,34 +112,22 @@ export default function Header({
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center gap-1.5 sm:gap-2">
-        {/* Mindmap / Connected Knowledge Graph Button */}
+      <div className="flex items-center gap-1 sm:gap-2">
+        {/* Mindmap / Connected Knowledge Graph Button (hidden on mobile, visible on sm+) */}
         <button
           onClick={onOpenMindmap}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-indigo-500/30 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 hover:border-indigo-500/60 text-xs font-bold text-indigo-600 dark:text-indigo-400 transition-all cursor-pointer shadow-xs"
+          className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-indigo-500/30 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 hover:border-indigo-500/60 text-xs font-bold text-indigo-600 dark:text-indigo-400 transition-all cursor-pointer shadow-xs"
           title={t.header.mindmapTooltip}
         >
           <Share2 className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" />
-          <span className="hidden sm:inline">{t.header.mindmap}</span>
+          <span className="hidden md:inline">{t.header.mindmap}</span>
           <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
         </button>
 
-        {/* Offline Translation Modal Trigger (Temporarily disabled as requested; preserved for future use) */}
-        {false && (
-          <button
-            onClick={onOpenTranslation}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)] text-xs font-semibold text-[var(--text-main)] transition-colors cursor-pointer"
-            title={t.header.translateTooltip}
-          >
-            <Languages className="w-3.5 h-3.5 text-[var(--accent)]" />
-            <span className="hidden sm:inline">{t.header.translate}</span>
-          </button>
-        )}
-
-        {/* Selection Translation Popup Quick Toggle */}
+        {/* Selection Translation Popup Quick Toggle (hidden on mobile, visible on md+) */}
         <button
           onClick={() => setSelectionLookupEnabled(!selectionLookupEnabled)}
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
+          className={`hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
             selectionLookupEnabled
               ? 'bg-[var(--accent-light)] border-[var(--accent)]/40 text-[var(--accent)]'
               : 'bg-[var(--bg-surface)] border-[var(--border-color)] text-[var(--text-muted)]'
@@ -147,19 +135,19 @@ export default function Header({
           title={selectionLookupEnabled ? t.header.selectionPopupTitleOn : t.header.selectionPopupTitleOff}
         >
           <span className={`w-2 h-2 rounded-full ${selectionLookupEnabled ? 'bg-emerald-500' : 'bg-slate-400'}`} />
-          <span className="hidden md:inline">
+          <span className="hidden lg:inline">
             {selectionLookupEnabled ? t.header.selectionPopupOn : t.header.selectionPopupOff}
           </span>
         </button>
 
-        {/* Saved Vocabulary Vault */}
+        {/* Saved Vocabulary Vault (hidden on mobile, visible on sm+) */}
         <button
           onClick={onOpenSavedWords}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)] text-xs font-semibold text-[var(--text-main)] transition-colors cursor-pointer"
+          className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)] text-xs font-semibold text-[var(--text-main)] transition-colors cursor-pointer"
           title={t.header.myWordsTooltip}
         >
           <Bookmark className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-          <span className="hidden sm:inline">{t.header.myWords}</span>
+          <span className="hidden md:inline">{t.header.myWords}</span>
           {savedWordsCount > 0 && (
             <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 font-bold">
               {savedWordsCount}
@@ -167,10 +155,10 @@ export default function Header({
           )}
         </button>
 
-        {/* Full-Screen / Zen Mode Toggle */}
+        {/* Full-Screen / Zen Mode Toggle (hidden on small mobile) */}
         <button
           onClick={() => setIsZenMode(!isZenMode)}
-          className={`p-2 rounded-xl border transition-colors cursor-pointer ${
+          className={`hidden sm:flex p-2 rounded-xl border transition-colors cursor-pointer ${
             isZenMode
               ? 'bg-[var(--accent)] text-white border-transparent'
               : 'border-[var(--border-color)] bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)] text-[var(--text-muted)]'
@@ -184,7 +172,7 @@ export default function Header({
         <button
           type="button"
           onClick={() => setIsDarkMode(!isDarkMode)}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)] text-xs font-semibold text-[var(--text-main)] transition-all cursor-pointer shadow-xs"
+          className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)] text-xs font-semibold text-[var(--text-main)] transition-all cursor-pointer shadow-xs flex items-center gap-1.5"
           title={isDarkMode ? t.header.switchToLight : t.header.switchToDark}
         >
           {isDarkMode ? (
@@ -204,27 +192,26 @@ export default function Header({
         <button
           type="button"
           onClick={toggleLanguage}
-          className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)] text-xs font-bold text-[var(--text-main)] transition-all cursor-pointer shadow-xs"
+          className="flex items-center gap-1 px-2 py-1.5 sm:px-2.5 sm:py-1.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)] text-xs font-bold text-[var(--text-main)] transition-all cursor-pointer shadow-xs"
           title={t.header.switchLanguage}
         >
           <span className="text-xs">{appLanguage === 'en' ? '🇬🇧' : '🇹🇷'}</span>
           <span className="text-[11px] uppercase tracking-wide">{appLanguage === 'en' ? 'EN' : 'TR'}</span>
         </button>
 
-
-        {/* Dictionary Browser */}
+        {/* Dictionary Browser (hidden on mobile, visible on sm+) */}
         <button
           onClick={onOpenDictionary}
-          className="p-2 rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)] text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors cursor-pointer"
+          className="hidden sm:flex p-2 rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)] text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors cursor-pointer"
           title={t.header.dictionaryTooltip}
         >
           <BookMarked className="w-4 h-4" />
         </button>
 
-        {/* Help & User Guide Modal Trigger */}
+        {/* Help & User Guide Modal Trigger (hidden on mobile, visible on md+) */}
         <button
           onClick={onOpenHelpGuide}
-          className="p-2 rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] hover:bg-sky-500/10 hover:border-sky-500 text-[var(--text-muted)] hover:text-sky-500 transition-colors cursor-pointer"
+          className="hidden md:flex p-2 rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] hover:bg-sky-500/10 hover:border-sky-500 text-[var(--text-muted)] hover:text-sky-500 transition-colors cursor-pointer"
           title={appLanguage === 'en' ? 'Help & Interactive Guide' : 'Yardım & Akıllı Rehber'}
         >
           <HelpCircle className="w-4 h-4" />
@@ -233,7 +220,7 @@ export default function Header({
         {/* Settings */}
         <button
           onClick={onOpenSettings}
-          className="p-2 rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)] text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors cursor-pointer"
+          className="p-1.5 sm:p-2 rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)] text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors cursor-pointer"
           title={t.header.settingsTooltip}
         >
           <Settings className="w-4 h-4" />
@@ -242,10 +229,10 @@ export default function Header({
         {/* New Note Button */}
         <button
           onClick={onOpenNewNoteModal}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--accent)] text-white text-xs font-bold hover:opacity-90 shadow-sm transition-opacity cursor-pointer"
+          className="flex items-center gap-1 sm:gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-[var(--accent)] text-white text-xs font-bold hover:opacity-90 shadow-sm transition-opacity cursor-pointer"
         >
           <Plus className="w-4 h-4" />
-          <span className="hidden xs:inline">{t.header.newNote}</span>
+          <span className="hidden sm:inline">{t.header.newNote}</span>
         </button>
       </div>
     </header>

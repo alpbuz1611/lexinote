@@ -75,6 +75,7 @@ export default function Editor({
   allNotes = [],
   onSelectNote = () => {},
   onUpdateNote,
+  onDeleteNote = () => {},
   onLockNote,
   onUnlockNote,
   spellCheckEnabled = true,
@@ -119,15 +120,21 @@ export default function Editor({
   const [showBacklinksPanel, setShowBacklinksPanel] = useState(true);
 
   const textareaRef = useRef(null);
+  const typingTimerRef = useRef(null);
 
-  // Undo / Redo history stack
+  // Undo / Redo history stack and reactive UI states
   const historyRef = useRef([note.content || '']);
   const historyIdxRef = useRef(0);
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
 
   // Synchronize history when switching notes
   useEffect(() => {
     historyRef.current = [note.content || ''];
     historyIdxRef.current = 0;
+    setCanUndo(false);
+    setCanRedo(false);
+    clearTimeout(typingTimerRef.current);
   }, [note.id]);
 
   // Persist font & view preferences
@@ -217,13 +224,24 @@ export default function Editor({
     );
   }
 
-  // Commit text with Undo/Redo stack tracking
-  const commitContent = (newText, cursorPos = null) => {
+  // Push a distinct state into the Undo/Redo stack and update reactive controls
+  const pushHistorySnapshot = (newText) => {
     const nextStack = historyRef.current.slice(0, historyIdxRef.current + 1);
-    nextStack.push(newText);
-    if (nextStack.length > 50) nextStack.shift();
-    historyRef.current = nextStack;
-    historyIdxRef.current = nextStack.length - 1;
+    if (nextStack[nextStack.length - 1] !== newText) {
+      nextStack.push(newText);
+      if (nextStack.length > 60) nextStack.shift();
+      historyRef.current = nextStack;
+      historyIdxRef.current = nextStack.length - 1;
+      setCanUndo(historyIdxRef.current > 0);
+      setCanRedo(false);
+    }
+  };
+
+  // Commit text with Undo/Redo stack tracking
+  const commitContent = (newText, cursorPos = null, isLiveTyping = false) => {
+    if (!isLiveTyping) {
+      pushHistorySnapshot(newText);
+    }
 
     onUpdateNote({
       ...note,
@@ -246,7 +264,10 @@ export default function Editor({
     if (historyIdxRef.current > 0) {
       historyIdxRef.current -= 1;
       const prev = historyRef.current[historyIdxRef.current];
+      setCanUndo(historyIdxRef.current > 0);
+      setCanRedo(true);
       onUpdateNote({ ...note, content: prev, updatedAt: new Date().toISOString() });
+      sound.playPop();
     }
   };
 
@@ -254,7 +275,10 @@ export default function Editor({
     if (historyIdxRef.current < historyRef.current.length - 1) {
       historyIdxRef.current += 1;
       const next = historyRef.current[historyIdxRef.current];
+      setCanUndo(true);
+      setCanRedo(historyIdxRef.current < historyRef.current.length - 1);
       onUpdateNote({ ...note, content: next, updatedAt: new Date().toISOString() });
+      sound.playPop();
     }
   };
 
@@ -400,11 +424,13 @@ export default function Editor({
     }
   };
 
-  // Handle live typing & Autocorrect
+  // Handle live typing & Autocorrect with smart Undo history snapshotting
   const handleContentChange = (e) => {
     const newContent = e.target.value;
     const selectionEnd = e.target.selectionEnd;
+    const oldContent = note.content || '';
 
+    const isBigChange = Math.abs(newContent.length - oldContent.length) > 1;
     const prevChar = newContent[selectionEnd - 1];
     const isSeparator = /[\s.,!?;:]/.test(prevChar);
 
@@ -425,13 +451,30 @@ export default function Editor({
             newContent.slice(wordStartIndex + lastWord.length);
 
           const newCursorPos = wordStartIndex + corrected.length + 1;
-          commitContent(updatedContent, newCursorPos);
+          commitContent(updatedContent, newCursorPos, false);
           return;
         }
       }
     }
 
-    commitContent(newContent);
+    // Update note content immediately for 100% fluid typing responsiveness
+    onUpdateNote({
+      ...note,
+      content: newContent,
+      updatedAt: new Date().toISOString()
+    });
+
+    // If large change (bulk paste, deletion of text) or word boundary, capture snapshot immediately
+    if (isBigChange || isSeparator) {
+      clearTimeout(typingTimerRef.current);
+      pushHistorySnapshot(newContent);
+    } else {
+      // Debounce continuous character typing
+      clearTimeout(typingTimerRef.current);
+      typingTimerRef.current = setTimeout(() => {
+        pushHistorySnapshot(newContent);
+      }, 500);
+    }
   };
 
   // Selection detection for Translation Popup (ONLY if selectionLookupEnabled is true)
@@ -672,14 +715,14 @@ export default function Editor({
       />
 
       {/* TOP ACTION & SETTING TOOLBAR */}
-      <div className="border-b border-[var(--border-color)] bg-[var(--bg-secondary)] px-4 sm:px-8 py-2 flex flex-wrap items-center justify-between gap-2.5 sticky top-0 z-20 shadow-xs">
-        {/* Language, Spellcheck & Autocorrect Controls */}
-        <div className="flex items-center gap-2 flex-wrap">
+      <div className="border-b border-[var(--border-color)] bg-[var(--bg-secondary)] px-2 sm:px-6 md:px-8 py-2 flex flex-wrap items-center justify-between gap-2 sticky top-0 z-20 shadow-xs">
+        {/* Left: Language, Mode & Reactive Undo/Redo */}
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
           {/* Note Language Selector */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-color)] text-xs">
+          <div className="flex items-center gap-1 sm:gap-1.5 px-2 py-1 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-color)] text-xs">
             <Globe className="w-3.5 h-3.5 text-[var(--accent)]" />
-            <span className="text-[11px] text-[var(--text-muted)] font-medium">
-              {appLanguage === 'en' ? 'Lexicon:' : 'Dil & Sözlük:'}
+            <span className="text-[11px] text-[var(--text-muted)] font-medium hidden sm:inline">
+              {appLanguage === 'en' ? 'Lexicon:' : 'Dil:'}
             </span>
             <select
               value={note.language || 'en'}
@@ -690,19 +733,16 @@ export default function Editor({
                   updatedAt: new Date().toISOString()
                 })
               }
-              className="bg-transparent font-bold text-[var(--text-main)] focus:outline-none cursor-pointer"
+              className="bg-transparent font-bold text-[var(--text-main)] focus:outline-none cursor-pointer text-xs"
             >
-              <option value="en">🇬🇧 Oxford / Cambridge EN</option>
-              <option value="tr">🇹🇷 TDK Güncel Türkçe</option>
+              <option value="en">🇬🇧 EN</option>
+              <option value="tr">🇹🇷 TR</option>
             </select>
           </div>
 
           {/* Note Mode Selector (Sade Boş Sayfa, İş, Günlük) */}
-          <div className="flex items-center p-1 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-color)] text-xs">
-            <span className="text-[11px] font-bold text-[var(--text-muted)] px-1.5 hidden sm:inline">
-              {appLanguage === 'en' ? 'Mode:' : 'Tür:'}
-            </span>
-            <div className="flex items-center gap-1">
+          <div className="flex items-center p-0.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-color)] text-xs">
+            <div className="flex items-center gap-0.5 sm:gap-1">
               <button
                 type="button"
                 onClick={() =>
@@ -712,7 +752,7 @@ export default function Editor({
                     updatedAt: new Date().toISOString()
                   })
                 }
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   (note.mode || 'plain') === 'plain'
                     ? 'bg-purple-600 text-white shadow-xs'
                     : 'text-[var(--text-main)] hover:bg-[var(--bg-hover)] opacity-85 hover:opacity-100'
@@ -720,7 +760,7 @@ export default function Editor({
                 title={t.editor.modePlain}
               >
                 <span>📄</span>
-                <span>{t.editor.modePlain}</span>
+                <span className="hidden xs:inline">{t.editor.modePlain}</span>
               </button>
               <button
                 type="button"
@@ -731,7 +771,7 @@ export default function Editor({
                     updatedAt: new Date().toISOString()
                   })
                 }
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   note.mode === 'work'
                     ? 'bg-sky-600 text-white shadow-xs'
                     : 'text-[var(--text-main)] hover:bg-[var(--bg-hover)] opacity-85 hover:opacity-100'
@@ -739,7 +779,7 @@ export default function Editor({
                 title={t.editor.modeWork}
               >
                 <span>💼</span>
-                <span>{t.editor.modeWork}</span>
+                <span className="hidden xs:inline">{t.editor.modeWork}</span>
               </button>
               <button
                 type="button"
@@ -750,7 +790,7 @@ export default function Editor({
                     updatedAt: new Date().toISOString()
                   })
                 }
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   note.mode === 'journal'
                     ? 'bg-rose-600 text-white shadow-xs'
                     : 'text-[var(--text-main)] hover:bg-[var(--bg-hover)] opacity-85 hover:opacity-100'
@@ -758,58 +798,50 @@ export default function Editor({
                 title={t.editor.modeJournal}
               >
                 <span>📖</span>
-                <span>{t.editor.modeJournal}</span>
+                <span className="hidden xs:inline">{t.editor.modeJournal}</span>
               </button>
             </div>
           </div>
 
-          {/* Spellcheck Status Pill */}
-          <div className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-color)] text-xs text-[var(--text-muted)]">
-            <CheckCheck className={`w-3.5 h-3.5 ${spellCheckEnabled ? 'text-emerald-500' : 'text-slate-400'}`} />
-            <span className="text-[11px] font-medium">
-              {appLanguage === 'en' ? 'Spellcheck:' : 'Yazım:'}
-            </span>
-            <span className="font-bold text-[var(--text-main)]">
-              {spellCheckEnabled ? (note.language === 'en' ? 'ENABLE1 (172k)' : 'TDK Türkçe') : (appLanguage === 'en' ? 'Off' : 'Kapalı')}
-            </span>
+          {/* Quick Undo / Redo in Top Bar */}
+          <div className="flex items-center bg-[var(--bg-surface)] border border-[var(--border-color)] rounded-xl p-0.5">
+            <button
+              type="button"
+              onClick={handleUndo}
+              disabled={!canUndo}
+              className="p-1 sm:px-2 sm:py-1 rounded-lg text-xs font-semibold flex items-center gap-1 text-[var(--text-main)] hover:bg-[var(--bg-secondary)] disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer"
+              title={appLanguage === 'en' ? 'Undo (Ctrl+Z)' : 'Geri Al (Ctrl+Z)'}
+            >
+              <Undo2 className="w-3.5 h-3.5" />
+              <span className="hidden md:inline text-[11px]">{appLanguage === 'en' ? 'Undo' : 'Geri Al'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleRedo}
+              disabled={!canRedo}
+              className="p-1 sm:px-2 sm:py-1 rounded-lg text-xs font-semibold flex items-center gap-1 text-[var(--text-main)] hover:bg-[var(--bg-secondary)] disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer"
+              title={appLanguage === 'en' ? 'Redo (Ctrl+Y)' : 'Yinele (Ctrl+Y)'}
+            >
+              <Redo2 className="w-3.5 h-3.5" />
+              <span className="hidden md:inline text-[11px]">{appLanguage === 'en' ? 'Redo' : 'Yinele'}</span>
+            </button>
           </div>
-
-          {/* Autocorrect Mode Pill */}
-          <div className="flex items-center gap-1 px-2 py-1 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-color)] text-xs text-[var(--text-muted)]">
-            <Zap className="w-3.5 h-3.5 text-amber-500" />
-            <span className="text-[11px] font-medium">
-              {appLanguage === 'en' ? 'Autocorrect:' : 'Oto-Düzeltme:'}
-            </span>
-            <span className="font-bold text-[var(--text-main)]">
-              {autoCorrectMode === 'instant'
-                ? (appLanguage === 'en' ? 'Instant' : 'Anında')
-                : autoCorrectMode === 'on_finish'
-                ? (appLanguage === 'en' ? 'Prompt' : 'Sorarak')
-                : (appLanguage === 'en' ? 'Off' : 'Kapalı')}
-            </span>
-          </div>
-
-          {/* End-of-Draft Spellcheck Inspection Button */}
-          <button
-            type="button"
-            onClick={() => setShowBatchModal(true)}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-[var(--accent-light)] text-[var(--accent)] border border-[var(--accent)]/30 hover:opacity-90 shadow-xs transition-all cursor-pointer"
-            title={appLanguage === 'en' ? 'Batch inspect all typos in note' : 'Metindeki yazım hatalarını topluca incele ve Tik/Çarpı ile onayla'}
-          >
-            <CheckCheck className="w-3.5 h-3.5" />
-            <span>{appLanguage === 'en' ? 'Check Document' : 'Yazımı Denetle (✓/✗)'}</span>
-          </button>
-
-          {/* Batch Notice Toast */}
-          {batchNotice && (
-            <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 animate-in fade-in">
-              ✓ {batchNotice}
-            </span>
-          )}
         </div>
 
-        {/* Right Tools: Zen Mode & Lock */}
-        <div className="flex items-center gap-2">
+        {/* Right Tools: Delete Note, Zen Mode & Lock */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Delete Note Button */}
+          <button
+            type="button"
+            onClick={() => {
+              if (onDeleteNote) onDeleteNote(note.id);
+            }}
+            className="flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-950/70 border border-rose-200 dark:border-rose-900/60 transition-colors cursor-pointer"
+            title={t.editor?.deleteNote || (appLanguage === 'en' ? 'Delete Note' : 'Notu Sil')}
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">{t.editor?.deleteNote || (appLanguage === 'en' ? 'Delete' : 'Sil')}</span>
+          </button>
           {/* Zen Focus Mode Button */}
           <button
             onClick={() => setIsZenMode(!isZenMode)}
@@ -896,10 +928,10 @@ export default function Editor({
         </div>
       </div>
 
-      {/* RICH TEXT FORMATTING TOOLBAR */}
-      <div className="border-b border-[var(--border-color)] bg-[var(--bg-surface)]/70 px-4 sm:px-8 py-1.5 flex flex-wrap items-center justify-between gap-1.5 sticky top-[45px] z-10 backdrop-blur-xs">
+      {/* RICH TEXT FORMATTING TOOLBAR (Sleek Horizontal Scroll Ribbon on Mobile) */}
+      <div className="border-b border-[var(--border-color)] bg-[var(--bg-surface)]/95 px-2 sm:px-6 py-1.5 flex items-center justify-between gap-2 overflow-x-auto no-scrollbar whitespace-nowrap z-10 backdrop-blur-xs">
         {/* Left: Text Formatting Controls */}
-        <div className="flex items-center gap-1 flex-wrap">
+        <div className="flex items-center gap-1 flex-nowrap shrink-0">
           {/* Headings Selector */}
           <div className="flex items-center bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-0.5">
             <button
@@ -1088,7 +1120,7 @@ export default function Editor({
             <button
               type="button"
               onClick={handleUndo}
-              disabled={historyIdxRef.current <= 0}
+              disabled={!canUndo}
               className="p-1.5 rounded hover:bg-[var(--bg-surface)] text-[var(--text-main)] disabled:opacity-30 cursor-pointer"
               title="Geri Al (Ctrl+Z)"
             >
@@ -1097,7 +1129,7 @@ export default function Editor({
             <button
               type="button"
               onClick={handleRedo}
-              disabled={historyIdxRef.current >= historyRef.current.length - 1}
+              disabled={!canRedo}
               className="p-1.5 rounded hover:bg-[var(--bg-surface)] text-[var(--text-main)] disabled:opacity-30 cursor-pointer"
               title="Yinele (Ctrl+Y)"
             >
@@ -1107,7 +1139,7 @@ export default function Editor({
         </div>
 
         {/* Right: Typography (Font Family & Size) & View Mode Selector */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 shrink-0">
           {/* Font Family Selector */}
           <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-color)] text-xs">
             <Type className="w-3 h-3 text-[var(--text-muted)]" />
@@ -1115,7 +1147,7 @@ export default function Editor({
               value={editorFont}
               onChange={e => setEditorFont(e.target.value)}
               style={{ fontFamily: resolvedFontFamily }}
-              className="bg-transparent text-xs font-semibold text-[var(--text-main)] focus:outline-none cursor-pointer"
+              className="bg-transparent text-xs font-semibold text-[var(--text-main)] focus:outline-none cursor-pointer max-w-[120px] sm:max-w-none truncate"
               title="Yazı Tipi Seçimi"
             >
               <option value="Noto Sans" style={{ fontFamily: "'Noto Sans', sans-serif" }}>Noto Sans (Modern Sans)</option>
@@ -1188,7 +1220,7 @@ export default function Editor({
       </div>
 
       {/* MAIN DOCUMENT BODY */}
-      <div className={`w-full mx-auto px-4 sm:px-8 py-6 space-y-6 ${isZenMode ? 'max-w-3xl' : 'max-w-4xl'}`}>
+      <div className={`w-full mx-auto px-2.5 sm:px-6 md:px-8 py-3 sm:py-6 space-y-3 sm:space-y-6 ${isZenMode ? 'max-w-3xl' : 'max-w-4xl'}`}>
         {/* Title Input */}
         <input
           type="text"
@@ -1202,7 +1234,7 @@ export default function Editor({
           }
           placeholder={t.editor.titlePlaceholder}
           style={{ fontFamily: resolvedFontFamily }}
-          className="w-full text-2xl sm:text-4xl font-black text-[var(--text-main)] bg-transparent border-none placeholder-[var(--text-muted)]/50 focus:outline-none tracking-tight"
+          className="w-full text-xl sm:text-3xl md:text-4xl font-extrabold text-[var(--text-main)] bg-transparent border-none placeholder-[var(--text-muted)]/50 focus:outline-none tracking-tight"
         />
 
         {/* Custom User Tags */}
@@ -1548,13 +1580,13 @@ export default function Editor({
                   fontSize: editorFontSize,
                   lineHeight: note.mode === 'journal' ? '1.85' : '1.6'
                 }}
-                className="w-full p-4 sm:p-6 rounded-2xl bg-transparent border border-[var(--border-color)] text-[var(--text-main)] placeholder-[var(--text-muted)]/50 leading-relaxed focus:outline-none focus:ring-2 focus:ring-[var(--accent)] resize-y shadow-xs"
+                className="w-full p-3 sm:p-6 rounded-xl sm:rounded-2xl bg-transparent border border-[var(--border-color)] text-[var(--text-main)] placeholder-[var(--text-muted)]/50 leading-relaxed focus:outline-none focus:ring-2 focus:ring-[var(--accent)] resize-y shadow-xs"
               />
             </div>
           )}
 
           {viewMode === 'preview' && (
-            <div className="p-6 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-color)] shadow-xs min-h-[380px]">
+            <div className="p-3 sm:p-6 rounded-xl sm:rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-color)] shadow-xs min-h-[380px]">
               <MarkdownRenderer
                 content={note.content || ''}
                 allNotes={allNotes}
@@ -1590,11 +1622,11 @@ export default function Editor({
                     fontSize: editorFontSize,
                     lineHeight: note.mode === 'journal' ? '1.85' : '1.6'
                   }}
-                  className="w-full p-4 rounded-2xl bg-transparent border border-[var(--border-color)] text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] resize-y shadow-xs"
+                  className="w-full p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-transparent border border-[var(--border-color)] text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] resize-y shadow-xs"
                 />
               </div>
 
-              <div className="p-5 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-color)] shadow-xs overflow-y-auto max-h-[520px]">
+              <div className="p-3 sm:p-5 rounded-xl sm:rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-color)] shadow-xs overflow-y-auto max-h-[520px]">
                 <MarkdownRenderer
                   content={note.content || ''}
                   allNotes={allNotes}
