@@ -124,22 +124,6 @@ export default function Header({
           <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
         </button>
 
-        {/* Selection Translation Popup Quick Toggle (hidden on mobile, visible on md+) */}
-        <button
-          onClick={() => setSelectionLookupEnabled(!selectionLookupEnabled)}
-          className={`hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
-            selectionLookupEnabled
-              ? 'bg-[var(--accent-light)] border-[var(--accent)]/40 text-[var(--accent)]'
-              : 'bg-[var(--bg-surface)] border-[var(--border-color)] text-[var(--text-muted)]'
-          }`}
-          title={selectionLookupEnabled ? t.header.selectionPopupTitleOn : t.header.selectionPopupTitleOff}
-        >
-          <span className={`w-2 h-2 rounded-full ${selectionLookupEnabled ? 'bg-emerald-500' : 'bg-slate-400'}`} />
-          <span className="hidden lg:inline">
-            {selectionLookupEnabled ? t.header.selectionPopupOn : t.header.selectionPopupOff}
-          </span>
-        </button>
-
         {/* Saved Vocabulary Vault (hidden on mobile, visible on sm+) */}
         <button
           onClick={onOpenSavedWords}

@@ -98,7 +98,7 @@ export default function App() {
   });
 
   const [selectionLookupEnabled, setSelectionLookupEnabled] = useState(() => {
-    return localStorage.getItem('lexinote_selection_lookup') !== 'false';
+    return localStorage.getItem('lexinote_selection_lookup') === 'true';
   });
 
   const [soundEffects, setSoundEffects] = useState(() => {
@@ -118,36 +118,19 @@ export default function App() {
     }
   });
 
-  // 6. Saved Vocabulary Vault
+  // 6. Saved Vocabulary Vault (Starts 100% clean with zero words per user request)
   const [savedWords, setSavedWords] = useState(() => {
     try {
       const saved = localStorage.getItem('lexinote_saved_words');
-      if (saved) return JSON.parse(saved);
-    } catch {}
-    return [
-      {
-        id: "w1",
-        word: "abroad",
-        translation: "yurt dışı / yurt dışında",
-        pos: "adverb",
-        cefr: "B1",
-        ipa: "/əˈbrɔːd/",
-        source: "Cambridge Academic",
-        lang: "en",
-        savedAt: new Date().toISOString()
-      },
-      {
-        id: "w2",
-        word: "gratitude",
-        translation: "şükran / minnettarlık",
-        pos: "noun",
-        cefr: "C1",
-        ipa: "/ˈɡrætɪtjuːd/",
-        source: "Oxford Advanced",
-        lang: "en",
-        savedAt: new Date().toISOString()
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          // Purge legacy dummy default words (w1, w2)
+          return parsed.filter(w => w.id !== 'w1' && w.id !== 'w2' && w.word !== 'abroad' && w.word !== 'gratitude');
+        }
       }
-    ];
+    } catch {}
+    return [];
   });
 
   // 7. UI Layout Modes

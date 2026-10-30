@@ -1139,38 +1139,40 @@ export default function Editor({
         </div>
 
         {/* Right: Typography (Font Family & Size) & View Mode Selector */}
-        <div className="flex items-center gap-1.5 shrink-0">
-          {/* Font Family Selector */}
-          <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-color)] text-xs">
-            <Type className="w-3 h-3 text-[var(--text-muted)]" />
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* Font Family Selector (Comfortably Sized) */}
+          <div className="flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] text-xs sm:text-sm font-semibold shadow-xs">
+            <Type className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[var(--accent)]" />
             <select
               value={editorFont}
               onChange={e => setEditorFont(e.target.value)}
               style={{ fontFamily: resolvedFontFamily }}
-              className="bg-transparent text-xs font-semibold text-[var(--text-main)] focus:outline-none cursor-pointer max-w-[120px] sm:max-w-none truncate"
+              className="bg-transparent text-xs sm:text-sm font-bold text-[var(--text-main)] focus:outline-none cursor-pointer"
               title="Yazı Tipi Seçimi"
             >
-              <option value="Noto Sans" style={{ fontFamily: "'Noto Sans', sans-serif" }}>Noto Sans (Modern Sans)</option>
-              <option value="Noto Serif" style={{ fontFamily: "'Noto Serif', serif" }}>Noto Serif (Zarif Serif / Kitap)</option>
-              <option value="DejaVu Mono" style={{ fontFamily: "'DejaVu Mono', monospace" }}>DejaVu Mono (Kod & Monospace)</option>
-              <option value="Lora" style={{ fontFamily: "'Lora', serif" }}>Lora (Klasik Edebi Serif)</option>
-              <option value="Inter" style={{ fontFamily: "'Inter', sans-serif" }}>Inter (Minimalist Düz Sans)</option>
-              <option value="Fira Code" style={{ fontFamily: "'Fira Code', monospace" }}>Fira Code (Modern Monospace)</option>
+              <option value="Noto Sans" style={{ fontFamily: "'Noto Sans', sans-serif" }}>Noto Sans</option>
+              <option value="Noto Serif" style={{ fontFamily: "'Noto Serif', serif" }}>Noto Serif</option>
+              <option value="DejaVu Mono" style={{ fontFamily: "'DejaVu Mono', monospace" }}>DejaVu Mono</option>
+              <option value="Lora" style={{ fontFamily: "'Lora', serif" }}>Lora</option>
+              <option value="Inter" style={{ fontFamily: "'Inter', sans-serif" }}>Inter</option>
+              <option value="Fira Code" style={{ fontFamily: "'Fira Code', monospace" }}>Fira Code</option>
             </select>
           </div>
 
-          {/* Font Size Selector */}
-          <div className="flex items-center px-1.5 py-0.5 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-color)] text-xs">
+          {/* Font Size Selector (Comfortably Sized) */}
+          <div className="flex items-center px-2 py-1 sm:px-3 sm:py-1.5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] text-xs sm:text-sm font-bold shadow-xs">
             <select
               value={editorFontSize}
               onChange={e => setEditorFontSize(e.target.value)}
-              className="bg-transparent text-xs font-semibold text-[var(--text-main)] focus:outline-none cursor-pointer"
+              className="bg-transparent text-xs sm:text-sm font-bold text-[var(--text-main)] focus:outline-none cursor-pointer"
               title="Yazı Boyutu Seçimi"
             >
               <option value="14px">14px</option>
               <option value="16px">16px</option>
               <option value="18px">18px</option>
               <option value="20px">20px</option>
+              <option value="22px">22px</option>
+              <option value="24px">24px</option>
             </select>
           </div>
 
@@ -1639,15 +1641,11 @@ export default function Editor({
             </div>
           )}
 
-          {/* Footer Stats & Real-time Indicator */}
-          <div className="flex flex-wrap items-center justify-between text-[11px] text-[var(--text-muted)] px-1 gap-2 border-t border-[var(--border-color)]/50 pt-2">
-            <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
-              <span>
-                {selectionLookupEnabled
-                  ? (appLanguage === 'en' ? 'Inline translation bubble active (double click to lookup)' : 'Çeviri balonu etkin (metin seçildiğinde FreeDict açılır)')
-                  : (appLanguage === 'en' ? 'Translation bubble off (focus mode)' : 'Çeviri balonu kapalı (odak modu)')}
-              </span>
+          {/* Footer Stats */}
+          <div className="flex items-center justify-between text-[11px] text-[var(--text-muted)] px-1 gap-2 border-t border-[var(--border-color)]/50 pt-2">
+            <span className="flex items-center gap-1.5 font-medium">
+              <span className="w-2 h-2 rounded-full bg-[var(--accent)] inline-block opacity-80" />
+              <span>{note.mode === 'work' ? (appLanguage === 'en' ? 'Work Mode' : 'İş Modu') : note.mode === 'journal' ? (appLanguage === 'en' ? 'Journal Mode' : 'Günlük Modu') : (appLanguage === 'en' ? 'Plain Note' : 'Sade Not')}</span>
             </span>
 
             <span className="font-medium">
