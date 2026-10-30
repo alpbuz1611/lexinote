@@ -3,6 +3,7 @@
 [![Canlı Web Uygulaması](https://img.shields.io/badge/Canl%C4%B1_Web-GitHub_Pages-brightgreen.svg)](https://alpbuz1611.github.io/lexinote/)
 [![Android APK İndir](https://img.shields.io/badge/APK_%C4%B0ndir-Android-success.svg?logo=android)](https://github.com/alpbuz1611/lexinote/releases)
 [![Windows EXE İndir](https://img.shields.io/badge/Windows_EXE-Windows_11-blue.svg?logo=windows)](https://github.com/alpbuz1611/lexinote/releases)
+[![macOS DMG İndir](https://img.shields.io/badge/macOS_DMG-macOS-orange.svg?logo=apple)](https://github.com/alpbuz1611/lexinote/releases)
 [![Sürüm](https://img.shields.io/badge/s%C3%BCr%C3%BCm-v0.1.0--beta-blue.svg)](https://github.com/alpbuz1611/lexinote/releases)
 [![Lisans](https://img.shields.io/badge/lisans-MIT-green.svg)](LICENSE)
 [![FreeDict](https://img.shields.io/badge/FreeDict-GPLv2%2B-orange.svg)](LICENSES.md)
@@ -27,11 +28,12 @@
 - [5. Sistem Mimarisi & Teknoloji Yığını](#5-sistem-mimarisi--teknoloji-yığını)
 - [6. Kurulum ve Çalıştırma](#6-kurulum-ve-çalıştırma)
 - [7. Windows 11 Masaüstü Kurulumu (.exe & PWA)](#7-windows-11-masaüstü-kurulumu-exe--pwa)
-- [8. Mobil Kurulum (Android APK)](#8-mobil-kurulum-android-apk)
-- [9. Adım Adım GitHub'a Yükleme Kılavuzu](#9-adım-adım-githuba-yükleme-kılavuzu)
-- [10. Proje Direktörü v0.1.0 Hazırlık Değerlendirmesi](#10-proje-direktörü-v010-hazırlık-değerlendirmesi)
-- [11. Gelecek Sürüm Yol Haritası (v0.2+)](#11-gelecek-sürüm-yol-haritası-v02)
-- [12. Lisanslar ve Hukuki Atıflar](#12-lisanslar-ve-hukuki-atıflar)
+- [8. macOS Masaüstü Kurulumu (.dmg & .zip)](#8-macos-masaüstü-kurulumu-dmg--zip)
+- [9. Mobil Kurulum (Android APK)](#9-mobil-kurulum-android-apk)
+- [10. Adım Adım GitHub'a Yükleme Kılavuzu](#10-adım-adım-githuba-yükleme-kılavuzu)
+- [11. Proje Direktörü v0.1.0 Hazırlık Değerlendirmesi](#11-proje-direktörü-v010-hazırlık-değerlendirmesi)
+- [12. Gelecek Sürüm Yol Haritası (v0.2+)](#12-gelecek-sürüm-yol-haritası-v02)
+- [13. Lisanslar ve Hukuki Atıflar](#13-lisanslar-ve-hukuki-atıflar)
 
 ---
 
@@ -204,7 +206,20 @@ Doğrudan Windows `.exe` kurulum paketini indirin:
 
 ---
 
-## 8. Mobil Kurulum (Android APK)
+## 8. macOS Masaüstü Kurulumu (.dmg & .zip)
+
+LexiNote, macOS (Apple Silicon M serisi ve Intel işlemcili Mac'ler) üzerinde yerel masaüstü uygulaması olarak çalışır:
+
+[![macOS DMG İndir](https://img.shields.io/badge/⬇️_%C4%B0ndir-macOS_DMG_(Apple_Silicon_&_Intel)-orange?style=for-the-badge&logo=apple)](https://github.com/alpbuz1611/lexinote/releases)
+
+1. **[macOS DMG İndir](https://github.com/alpbuz1611/lexinote/releases)** butonuna tıklayın (veya doğrudan: [LexiNote-0.1.0.dmg](https://github.com/alpbuz1611/lexinote/releases/download/v0.1.0/LexiNote-0.1.0.dmg) | Taşınabilir: [LexiNote-0.1.0-mac.zip](https://github.com/alpbuz1611/lexinote/releases/download/v0.1.0/LexiNote-0.1.0-mac.zip)).
+2. İndirilen `.dmg` disk imajını açın.
+3. **LexiNote** simgesini **Applications** (Uygulamalar) klasörüne sürükleyip bırakın.
+4. Launchpad veya Spotlight üzerinden LexiNote'u sıfır telemetri ve %100 yerel hızla başlatın.
+
+---
+
+## 9. Mobil Kurulum (Android APK)
 
 LexiNote'u Android telefon veya tabletinize doğrudan APK olarak kurun:
 
@@ -215,7 +230,7 @@ LexiNote'u Android telefon veya tabletinize doğrudan APK olarak kurun:
 
 ---
 
-## 9. Adım Adım GitHub'a Yükleme Kılavuzu
+## 10. Adım Adım GitHub'a Yükleme Kılavuzu
 
 Projenizi GitHub'a yüklemek için aşağıdaki adımları sırasıyla uygulayabilirsiniz:
 
@@ -242,7 +257,7 @@ git push -u origin main
 
 ---
 
-## 10. Proje Direktörü v0.1.0 Hazırlık Değerlendirmesi
+## 11. Proje Direktörü v0.1.0 Hazırlık Değerlendirmesi
 
 > **Değerlendirme Özeti:** Proje mimari, fonksiyonellik, veri tutarlılığı ve yasal uyumluluk açısından **v0.1.0-beta sürümü olarak GitHub'da yayımlanmaya %100 HAZIRDIR.**
 
@@ -256,7 +271,7 @@ git push -u origin main
 
 ---
 
-## 11. Gelecek Sürüm Yol Haritası (v0.2+)
+## 12. Gelecek Sürüm Yol Haritası (v0.2+)
 
 LexiNote'u küresel çapta öne çıkaracak bir sonraki geliştirme hedefleri:
 
@@ -268,15 +283,7 @@ LexiNote'u küresel çapta öne çıkaracak bir sonraki geliştirme hedefleri:
 
 ---
 
-## 12. Lisanslar ve Hukuki Atıflar
-2. **🕸️ 2D/3D Etkileşimli Not İlişki Grafiği (Canvas Graph View):** Notlar arasındaki `[[bağlantıları]]` görsel bir ağaç ve düğüm haritası olarak canlandıran interaktif tuval.
-3. **🎙️ Yerel WebSpeech / Whisper Çevrimdışı Sesli Not Alma:** Kullanıcı konuşurken notu metne döken ve otomatik noktalama uygulayan yerel ses tanıma.
-4. **📊 Akıllı Markdown / PDF / ePub Dışa Aktarımı:** Notları şık biçimlendirilmiş akademik PDF veya kitapçık formatında tek tıkla dışa aktarma.
-5. **🏷️ Otomatik Anlamsal Etiketleme (Semantic Tagging):** Notun içeriğindeki anahtar kelimeleri tespit edip otomatik etiket öneren yerel kural motoru.
-
----
-
-## 11. Lisanslar ve Hukuki Atıflar
+## 13. Lisanslar ve Hukuki Atıflar
 
 - **Uygulama Kodu:** MIT License © 2026 LexiNote Contributors.
 - **Sözlük Verisi:** FreeDict English–Turkish & Turkish–English sözlük verileri **GNU General Public License v2.0 or later (GPL-2.0-or-later)** ile lisanslanmıştır. Ayrıntılı yasal metin için [LICENSES.md](LICENSES.md) dosyasına bakınız.

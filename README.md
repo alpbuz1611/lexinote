@@ -3,6 +3,7 @@
 [![Live Web App](https://img.shields.io/badge/Live_Demo-GitHub_Pages-brightgreen.svg)](https://alpbuz1611.github.io/lexinote/)
 [![Download Android APK](https://img.shields.io/badge/Download_APK-Android-success.svg?logo=android)](https://github.com/alpbuz1611/lexinote/releases)
 [![Download Windows EXE](https://img.shields.io/badge/Download_EXE-Windows_11-blue.svg?logo=windows)](https://github.com/alpbuz1611/lexinote/releases)
+[![Download macOS DMG](https://img.shields.io/badge/Download_DMG-macOS-orange.svg?logo=apple)](https://github.com/alpbuz1611/lexinote/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![FreeDict: GPLv2+](https://img.shields.io/badge/FreeDict-GPLv2%2B-orange.svg)](LICENSES.md)
 [![ENABLE1: Public Domain](https://img.shields.io/badge/ENABLE1-Public_Domain-lightgrey.svg)](LICENSES.md)
@@ -28,9 +29,10 @@
 - [6. Technology Stack & Architecture](#6-technology-stack--architecture)
 - [7. Quickstart & Installation](#7-quickstart--installation)
 - [8. Windows 11 Desktop Installation (.exe & PWA)](#8-windows-11-desktop-installation-exe--pwa)
-- [9. Mobile Installation (Android APK)](#9-mobile-installation-android-apk)
-- [10. Release Verification Suite (37/37 Tests)](#10-release-verification-suite-3737-tests)
-- [11. Legal Attributions & Licenses](#11-legal-attributions--licenses)
+- [9. macOS Desktop Installation (.dmg & .zip)](#9-macos-desktop-installation-dmg--zip)
+- [10. Mobile Installation (Android APK)](#10-mobile-installation-android-apk)
+- [11. Release Verification Suite (37/37 Tests)](#11-release-verification-suite-3737-tests)
+- [12. Legal Attributions & Licenses](#12-legal-attributions--licenses)
 
 ---
 
@@ -189,7 +191,20 @@ Download the native Windows setup package directly:
 
 ---
 
-## 9. Mobile Installation (Android APK)
+## 9. macOS Desktop Installation (.dmg & .zip)
+
+LexiNote runs natively on macOS (Apple Silicon M-series & Intel):
+
+[![Download macOS DMG](https://img.shields.io/badge/⬇️_Download-macOS_DMG_(Apple_Silicon_&_Intel)-orange?style=for-the-badge&logo=apple)](https://github.com/alpbuz1611/lexinote/releases)
+
+1. Click **[Download macOS DMG](https://github.com/alpbuz1611/lexinote/releases)** (or direct download: [LexiNote-0.1.0.dmg](https://github.com/alpbuz1611/lexinote/releases/download/v0.1.0/LexiNote-0.1.0.dmg) | Portable: [LexiNote-0.1.0-mac.zip](https://github.com/alpbuz1611/lexinote/releases/download/v0.1.0/LexiNote-0.1.0-mac.zip)).
+2. Open the downloaded `.dmg` disk image.
+3. Drag **LexiNote** into your **Applications** folder.
+4. Launch LexiNote from Launchpad, Spotlight, or Applications for a dedicated, zero-telemetry desktop workstation.
+
+---
+
+## 10. Mobile Installation (Android APK)
 
 Install the standalone Android APK directly to your mobile device:
 
@@ -201,7 +216,7 @@ Install the standalone Android APK directly to your mobile device:
 
 ---
 
-## 10. Release Verification Suite (37/37 Tests)
+## 11. Release Verification Suite (37/37 Tests)
 
 LexiNote includes an end-to-end automated verification script covering all core engines:
 
@@ -249,7 +264,7 @@ node scripts/verify_e2e_release.js
 
 ---
 
-## 11. Legal Attributions & Licenses
+## 12. Legal Attributions & Licenses
 
 - **Application Code:** [MIT License](LICENSE) © 2026 Yigit Alp Buz & LexiNote Contributors.
 - **Dictionary Data:** FreeDict English-Turkish and Turkish-English datasets are licensed under the **GNU General Public License v2.0 or later (GPL-2.0-or-later)**. See [LICENSES.md](LICENSES.md) for full legal text and upstream source links.

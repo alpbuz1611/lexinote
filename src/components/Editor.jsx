@@ -113,7 +113,7 @@ export default function Editor({
   });
 
   const [editorFontSize, setEditorFontSize] = useState(() => {
-    return localStorage.getItem('lexinote_editor_size') || '18px';
+    return localStorage.getItem('lexinote_editor_size') || '20px';
   });
 
   const [showWikiPicker, setShowWikiPicker] = useState(false);
@@ -929,197 +929,198 @@ export default function Editor({
       </div>
 
       {/* RICH TEXT FORMATTING TOOLBAR (Sleek Horizontal Scroll Ribbon with Prominent Fonts) */}
-      <div className="border-b border-[var(--border-color)] bg-[var(--bg-surface)]/95 px-3 sm:px-6 py-2 flex items-center gap-2 sm:gap-3 overflow-x-auto no-scrollbar whitespace-nowrap z-10 backdrop-blur-xs">
+      <div className="border-b border-[var(--border-color)] bg-[var(--bg-surface)]/95 px-3 sm:px-6 py-2.5 sm:py-3 flex items-center gap-2.5 sm:gap-3.5 overflow-x-auto no-scrollbar whitespace-nowrap z-10 backdrop-blur-xs min-h-[56px] sm:min-h-[62px]">
         {/* 1. FRONT & PROMINENT: TYPOGRAPHY (Font Family & Font Size) */}
-        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          {/* Font Family Selector (Enlarged & Prominent) */}
-          <div className="h-10 sm:h-11 flex items-center gap-2 px-3 sm:px-4 rounded-xl bg-[var(--bg-secondary)] border-2 border-[var(--border-color)] shadow-xs hover:border-[var(--accent)] transition-all">
-            <Type className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--accent)] shrink-0" />
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* Font Family Selector (Substantially Enlarged & Prominent) */}
+          <div className="h-12 sm:h-13 flex items-center gap-2 px-3 sm:px-4 rounded-xl sm:rounded-2xl bg-[var(--bg-secondary)] border-2 border-[var(--border-color)] shadow-sm hover:border-[var(--accent)] transition-all">
+            <Type className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--accent)] shrink-0" />
             <select
               value={editorFont}
               onChange={e => setEditorFont(e.target.value)}
               style={{ fontFamily: resolvedFontFamily }}
-              className="bg-transparent text-xs sm:text-sm md:text-base font-extrabold text-[var(--text-main)] focus:outline-none cursor-pointer pr-1"
+              className="bg-transparent text-sm sm:text-base md:text-lg font-black text-[var(--text-main)] focus:outline-none cursor-pointer pr-1 py-1"
               title="Yazı Tipi Seçimi"
             >
-              <option value="Noto Sans" style={{ fontFamily: "'Noto Sans', sans-serif" }}>Noto Sans</option>
-              <option value="Noto Serif" style={{ fontFamily: "'Noto Serif', serif" }}>Noto Serif</option>
-              <option value="Lora" style={{ fontFamily: "'Lora', serif" }}>Lora</option>
-              <option value="Inter" style={{ fontFamily: "'Inter', sans-serif" }}>Inter</option>
-              <option value="DejaVu Mono" style={{ fontFamily: "'DejaVu Mono', monospace" }}>DejaVu Mono</option>
-              <option value="Fira Code" style={{ fontFamily: "'Fira Code', monospace" }}>Fira Code</option>
+              <option value="Noto Sans" style={{ fontFamily: "'Noto Sans', sans-serif" }} className="bg-[var(--bg-surface)] text-[var(--text-main)] py-1.5 text-base sm:text-lg font-bold">Noto Sans</option>
+              <option value="Noto Serif" style={{ fontFamily: "'Noto Serif', serif" }} className="bg-[var(--bg-surface)] text-[var(--text-main)] py-1.5 text-base sm:text-lg font-bold">Noto Serif</option>
+              <option value="Lora" style={{ fontFamily: "'Lora', serif" }} className="bg-[var(--bg-surface)] text-[var(--text-main)] py-1.5 text-base sm:text-lg font-bold">Lora</option>
+              <option value="Inter" style={{ fontFamily: "'Inter', sans-serif" }} className="bg-[var(--bg-surface)] text-[var(--text-main)] py-1.5 text-base sm:text-lg font-bold">Inter</option>
+              <option value="DejaVu Mono" style={{ fontFamily: "'DejaVu Mono', monospace" }} className="bg-[var(--bg-surface)] text-[var(--text-main)] py-1.5 text-base sm:text-lg font-bold">DejaVu Mono</option>
+              <option value="Fira Code" style={{ fontFamily: "'Fira Code', monospace" }} className="bg-[var(--bg-surface)] text-[var(--text-main)] py-1.5 text-base sm:text-lg font-bold">Fira Code</option>
             </select>
           </div>
 
-          {/* Font Size Selector (Enlarged & Prominent) */}
-          <div className="h-10 sm:h-11 flex items-center px-2.5 sm:px-3.5 rounded-xl bg-[var(--bg-secondary)] border-2 border-[var(--border-color)] shadow-xs hover:border-[var(--accent)] transition-all">
+          {/* Font Size Selector (Substantially Enlarged & Prominent) */}
+          <div className="h-12 sm:h-13 flex items-center px-3 sm:px-4 rounded-xl sm:rounded-2xl bg-[var(--bg-secondary)] border-2 border-[var(--border-color)] shadow-sm hover:border-[var(--accent)] transition-all">
             <select
               value={editorFontSize}
               onChange={e => setEditorFontSize(e.target.value)}
-              className="bg-transparent text-xs sm:text-sm md:text-base font-extrabold text-[var(--text-main)] focus:outline-none cursor-pointer"
+              className="bg-transparent text-sm sm:text-base md:text-lg font-black text-[var(--text-main)] focus:outline-none cursor-pointer py-1"
               title="Yazı Boyutu Seçimi"
             >
-              <option value="14px">14px</option>
-              <option value="16px">16px</option>
-              <option value="18px">18px</option>
-              <option value="20px">20px</option>
-              <option value="22px">22px</option>
-              <option value="24px">24px</option>
-              <option value="28px">28px</option>
-              <option value="32px">32px</option>
+              <option value="16px" className="bg-[var(--bg-surface)] text-[var(--text-main)] py-1.5 text-base sm:text-lg font-bold">16px</option>
+              <option value="18px" className="bg-[var(--bg-surface)] text-[var(--text-main)] py-1.5 text-base sm:text-lg font-bold">18px</option>
+              <option value="20px" className="bg-[var(--bg-surface)] text-[var(--text-main)] py-1.5 text-base sm:text-lg font-bold">20px</option>
+              <option value="22px" className="bg-[var(--bg-surface)] text-[var(--text-main)] py-1.5 text-base sm:text-lg font-bold">22px</option>
+              <option value="24px" className="bg-[var(--bg-surface)] text-[var(--text-main)] py-1.5 text-base sm:text-lg font-bold">24px</option>
+              <option value="28px" className="bg-[var(--bg-surface)] text-[var(--text-main)] py-1.5 text-base sm:text-lg font-bold">28px</option>
+              <option value="32px" className="bg-[var(--bg-surface)] text-[var(--text-main)] py-1.5 text-base sm:text-lg font-bold">32px</option>
+              <option value="36px" className="bg-[var(--bg-surface)] text-[var(--text-main)] py-1.5 text-base sm:text-lg font-bold">36px</option>
+              <option value="42px" className="bg-[var(--bg-surface)] text-[var(--text-main)] py-1.5 text-base sm:text-lg font-bold">42px</option>
             </select>
           </div>
         </div>
 
-        <div className="w-[1.5px] h-7 bg-[var(--border-color)] mx-0.5 shrink-0" />
+        <div className="w-[1.5px] h-8 bg-[var(--border-color)] mx-1 shrink-0" />
 
         {/* 2. INLINE STYLES: Bold, Italic, Underline, Strikethrough, Highlight */}
-        <div className="flex items-center bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-1 shrink-0 gap-0.5">
+        <div className="flex items-center bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl sm:rounded-2xl p-1 sm:p-1.5 shrink-0 gap-1">
           <button
             type="button"
             onClick={() => applyFormat('bold')}
-            className="p-1.5 sm:p-2 rounded-lg hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
+            className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
             title="Kalın (Ctrl+B)"
           >
-            <Bold className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            <Bold className="w-5 h-5 sm:w-5.5 sm:h-5.5" />
           </button>
           <button
             type="button"
             onClick={() => applyFormat('italic')}
-            className="p-1.5 sm:p-2 rounded-lg hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
+            className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
             title="İtalik (Ctrl+I)"
           >
-            <Italic className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            <Italic className="w-5 h-5 sm:w-5.5 sm:h-5.5" />
           </button>
           <button
             type="button"
             onClick={() => applyFormat('underline')}
-            className="p-1.5 sm:p-2 rounded-lg hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
+            className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
             title="Altı Çizili (Ctrl+U)"
           >
-            <Underline className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            <Underline className="w-5 h-5 sm:w-5.5 sm:h-5.5" />
           </button>
           <button
             type="button"
             onClick={() => applyFormat('strikethrough')}
-            className="p-1.5 sm:p-2 rounded-lg hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
+            className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
             title="Üstü Çizili"
           >
-            <Strikethrough className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            <Strikethrough className="w-5 h-5 sm:w-5.5 sm:h-5.5" />
           </button>
           <button
             type="button"
             onClick={() => applyFormat('highlight')}
-            className="p-1.5 sm:p-2 rounded-lg hover:bg-[var(--bg-surface)] text-amber-600 dark:text-amber-400 transition-colors cursor-pointer"
+            className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl hover:bg-[var(--bg-surface)] text-amber-600 dark:text-amber-400 transition-colors cursor-pointer"
             title="Metin Vurgulama"
           >
-            <Highlighter className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            <Highlighter className="w-5 h-5 sm:w-5.5 sm:h-5.5" />
           </button>
         </div>
 
-        <div className="w-[1.5px] h-7 bg-[var(--border-color)] mx-0.5 shrink-0" />
+        <div className="w-[1.5px] h-8 bg-[var(--border-color)] mx-1 shrink-0" />
 
         {/* 3. HEADINGS: H1, H2, H3, P */}
-        <div className="flex items-center bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-1 shrink-0 gap-0.5">
+        <div className="flex items-center bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl sm:rounded-2xl p-1 sm:p-1.5 shrink-0 gap-1">
           <button
             type="button"
             onClick={() => applyFormat('h1')}
-            className="p-1.5 sm:p-2 rounded-lg hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
+            className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
             title="Başlık 1 (H1)"
           >
-            <Heading1 className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            <Heading1 className="w-5 h-5 sm:w-5.5 sm:h-5.5" />
           </button>
           <button
             type="button"
             onClick={() => applyFormat('h2')}
-            className="p-1.5 sm:p-2 rounded-lg hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
+            className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
             title="Başlık 2 (H2)"
           >
-            <Heading2 className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            <Heading2 className="w-5 h-5 sm:w-5.5 sm:h-5.5" />
           </button>
           <button
             type="button"
             onClick={() => applyFormat('h3')}
-            className="p-1.5 sm:p-2 rounded-lg hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
+            className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
             title="Başlık 3 (H3)"
           >
-            <Heading3 className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            <Heading3 className="w-5 h-5 sm:w-5.5 sm:h-5.5" />
           </button>
           <button
             type="button"
             onClick={() => applyFormat('paragraph')}
-            className="px-2 py-1 rounded-lg hover:bg-[var(--bg-surface)] text-xs font-bold text-[var(--text-muted)] transition-colors cursor-pointer"
+            className="px-2.5 sm:px-3 py-1.5 rounded-lg sm:rounded-xl hover:bg-[var(--bg-surface)] text-sm sm:text-base font-black text-[var(--text-muted)] transition-colors cursor-pointer"
             title="Normal Paragraf"
           >
             P
           </button>
         </div>
 
-        <div className="w-[1.5px] h-7 bg-[var(--border-color)] mx-0.5 shrink-0" />
+        <div className="w-[1.5px] h-8 bg-[var(--border-color)] mx-1 shrink-0" />
 
         {/* 4. LISTS: Bullets, Numbered, Checklist, Quote, Code, Link */}
-        <div className="flex items-center bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-1 shrink-0 gap-0.5">
+        <div className="flex items-center bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl sm:rounded-2xl p-1 sm:p-1.5 shrink-0 gap-1">
           <button
             type="button"
             onClick={() => applyFormat('bullet-list')}
-            className="p-1.5 sm:p-2 rounded-lg hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
+            className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
             title="Madde İşaretli Liste"
           >
-            <List className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            <List className="w-5 h-5 sm:w-5.5 sm:h-5.5" />
           </button>
           <button
             type="button"
             onClick={() => applyFormat('number-list')}
-            className="p-1.5 sm:p-2 rounded-lg hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
+            className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
             title="Numaralı Liste"
           >
-            <ListOrdered className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            <ListOrdered className="w-5 h-5 sm:w-5.5 sm:h-5.5" />
           </button>
           <button
             type="button"
             onClick={() => applyFormat('task-list')}
-            className="p-1.5 sm:p-2 rounded-lg hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
+            className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
             title="Yapılacaklar / Görev Listesi"
           >
-            <CheckSquare className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            <CheckSquare className="w-5 h-5 sm:w-5.5 sm:h-5.5" />
           </button>
           <button
             type="button"
             onClick={() => applyFormat('quote')}
-            className="p-1.5 sm:p-2 rounded-lg hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
+            className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
             title="Alıntı Bloğu"
           >
-            <Quote className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            <Quote className="w-5 h-5 sm:w-5.5 sm:h-5.5" />
           </button>
           <button
             type="button"
             onClick={() => applyFormat('code-block')}
-            className="p-1.5 sm:p-2 rounded-lg hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
+            className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
             title="Kod Bloğu"
           >
-            <Code className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            <Code className="w-5 h-5 sm:w-5.5 sm:h-5.5" />
           </button>
           <button
             type="button"
             onClick={() => applyFormat('link')}
-            className="p-1.5 sm:p-2 rounded-lg hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
+            className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors cursor-pointer"
             title="Bağlantı Ekle [metin](url)"
           >
-            <Link className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            <Link className="w-5 h-5 sm:w-5.5 sm:h-5.5" />
           </button>
         </div>
 
-        <div className="w-[1.5px] h-7 bg-[var(--border-color)] mx-0.5 shrink-0" />
+        <div className="w-[1.5px] h-8 bg-[var(--border-color)] mx-1 shrink-0" />
 
         {/* 5. WIKI-LINK INSERTER */}
         <div className="relative shrink-0">
           <button
             type="button"
             onClick={() => setShowWikiPicker(!showWikiPicker)}
-            className="h-10 sm:h-11 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--accent)] hover:bg-[var(--bg-surface)] transition-all cursor-pointer shadow-xs"
+            className="h-12 sm:h-13 flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl sm:rounded-2xl text-xs sm:text-sm md:text-base font-bold bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--accent)] hover:bg-[var(--bg-surface)] transition-all cursor-pointer shadow-xs"
             title={appLanguage === 'en' ? 'Link Another Note [[Note Title]]' : 'Bağlantılı Not Ekle [[Not Adı]]'}
           >
-            <BookOpen className="w-4 h-4" />
+            <BookOpen className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
             <span>[[{appLanguage === 'en' ? 'Link Note' : 'Not Bağla'}]]</span>
           </button>
 
@@ -1154,72 +1155,72 @@ export default function Editor({
           )}
         </div>
 
-        <div className="w-[1.5px] h-7 bg-[var(--border-color)] mx-0.5 shrink-0" />
+        <div className="w-[1.5px] h-8 bg-[var(--border-color)] mx-1 shrink-0" />
 
         {/* 6. UNDO / REDO */}
-        <div className="flex items-center bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-1 shrink-0 gap-0.5">
+        <div className="flex items-center bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl sm:rounded-2xl p-1 sm:p-1.5 shrink-0 gap-1">
           <button
             type="button"
             onClick={handleUndo}
             disabled={!canUndo}
-            className="p-1.5 sm:p-2 rounded-lg hover:bg-[var(--bg-surface)] text-[var(--text-main)] disabled:opacity-30 cursor-pointer"
+            className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-main)] disabled:opacity-30 cursor-pointer"
             title="Geri Al (Ctrl+Z)"
           >
-            <Undo2 className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            <Undo2 className="w-5 h-5 sm:w-5.5 sm:h-5.5" />
           </button>
           <button
             type="button"
             onClick={handleRedo}
             disabled={!canRedo}
-            className="p-1.5 sm:p-2 rounded-lg hover:bg-[var(--bg-surface)] text-[var(--text-main)] disabled:opacity-30 cursor-pointer"
+            className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-main)] disabled:opacity-30 cursor-pointer"
             title="Yinele (Ctrl+Y)"
           >
-            <Redo2 className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            <Redo2 className="w-5 h-5 sm:w-5.5 sm:h-5.5" />
           </button>
         </div>
 
-        <div className="w-[1.5px] h-7 bg-[var(--border-color)] mx-0.5 shrink-0" />
+        <div className="w-[1.5px] h-8 bg-[var(--border-color)] mx-1 shrink-0" />
 
         {/* 7. VIEW MODE TOGGLE (Edit / Preview / Split) */}
-        <div className="flex items-center bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-1 shrink-0 gap-0.5">
+        <div className="flex items-center bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl sm:rounded-2xl p-1 sm:p-1.5 shrink-0 gap-1">
           <button
             type="button"
             onClick={() => setViewMode('edit')}
-            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors ${
+            className={`px-3 py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-colors ${
               viewMode === 'edit'
                 ? 'bg-[var(--accent)] text-white shadow-xs'
                 : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
             }`}
             title="Yalnızca Düzenle"
           >
-            <Edit3 className="w-3.5 h-3.5" />
-            <span className="hidden md:inline text-[11px]">Düzenle</span>
+            <Edit3 className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            <span className="hidden md:inline">Düzenle</span>
           </button>
           <button
             type="button"
             onClick={() => setViewMode('preview')}
-            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors ${
+            className={`px-3 py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-colors ${
               viewMode === 'preview'
                 ? 'bg-[var(--accent)] text-white shadow-xs'
                 : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
             }`}
             title="Yalnızca Önizle (Markdown)"
           >
-            <Eye className="w-3.5 h-3.5" />
-            <span className="hidden md:inline text-[11px]">Önizle</span>
+            <Eye className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            <span className="hidden md:inline">Önizle</span>
           </button>
           <button
             type="button"
             onClick={() => setViewMode('split')}
-            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold hidden lg:flex items-center gap-1 transition-colors ${
+            className={`px-3 py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold hidden lg:flex items-center gap-1.5 transition-colors ${
               viewMode === 'split'
                 ? 'bg-[var(--accent)] text-white shadow-xs'
                 : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
             }`}
             title="İki Bölmeli (Yan Yana)"
           >
-            <Columns2 className="w-3.5 h-3.5" />
-            <span className="text-[11px]">Bölünmüş</span>
+            <Columns2 className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            <span>Bölünmüş</span>
           </button>
         </div>
       </div>
@@ -1239,7 +1240,7 @@ export default function Editor({
           }
           placeholder={t.editor.titlePlaceholder}
           style={{ fontFamily: resolvedFontFamily }}
-          className="w-full text-xl sm:text-3xl md:text-4xl font-extrabold text-[var(--text-main)] bg-transparent border-none placeholder-[var(--text-muted)]/50 focus:outline-none tracking-tight"
+          className="w-full text-2xl sm:text-4xl md:text-5xl font-black text-[var(--text-main)] bg-transparent border-none placeholder-[var(--text-muted)]/50 focus:outline-none tracking-tight py-1"
         />
 
         {/* Custom User Tags */}

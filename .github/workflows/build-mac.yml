@@ -1,0 +1,59 @@
+name: Build macOS Application (.dmg & .zip)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-mac:
+    name: Package macOS .dmg & .zip
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Node Dependencies
+        run: npm install
+
+      - name: Compile Vite Web Application
+        run: npm run build
+
+      - name: Build macOS DMG & Portable ZIP
+        run: npx electron-builder --mac dmg zip --publish never
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload macOS Packages Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LexiNote-macOS-v0.1.0
+          path: |
+            release/*.dmg
+            release/*.zip
+          retention-days: 30
+
+      - name: Publish macOS .dmg and .zip to GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/heads/main')
+        with:
+          tag_name: v0.1.0
+          name: "LexiNote v0.1.0 (Public Release)"
+          draft: false
+          prerelease: false
+          files: |
+            release/*.dmg
+            release/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

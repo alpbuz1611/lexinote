@@ -12,7 +12,7 @@ export default function MarkdownRenderer({
   onSelectNote = () => {},
   onToggleTaskLine = () => {},
   fontFamily = 'var(--editor-font)',
-  fontSize = '16px'
+  fontSize = '20px'
 }) {
   if (!content) {
     return (
@@ -270,7 +270,7 @@ export default function MarkdownRenderer({
             )}
           </button>
           <div
-            className={`text-sm leading-relaxed ${
+            className={`leading-relaxed ${
               isChecked ? 'line-through text-[var(--text-muted)]' : 'text-[var(--text-main)]'
             }`}
           >
@@ -286,7 +286,7 @@ export default function MarkdownRenderer({
       elements.push(
         <div key={`bullet-${i}`} className="flex items-start gap-2.5 my-1 pl-2">
           <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] mt-2 flex-shrink-0" />
-          <div className="text-sm leading-relaxed text-[var(--text-main)]">
+          <div className="leading-relaxed text-[var(--text-main)]">
             {parseInline(trimmed.replace(/^[-*]\s+/, ''), `bullet-${i}`)}
           </div>
         </div>
@@ -302,7 +302,7 @@ export default function MarkdownRenderer({
           <span className="text-xs font-bold text-[var(--accent)] font-mono min-w-[20px] text-right mt-0.5">
             {numMatch[1]}.
           </span>
-          <div className="text-sm leading-relaxed text-[var(--text-main)]">
+          <div className="leading-relaxed text-[var(--text-main)]">
             {parseInline(numMatch[2], `num-${i}`)}
           </div>
         </div>
@@ -314,7 +314,7 @@ export default function MarkdownRenderer({
     elements.push(
       <p
         key={`p-${i}`}
-        className="text-sm sm:text-base leading-relaxed text-[var(--text-main)] my-2"
+        className="leading-relaxed text-[var(--text-main)] my-2"
       >
         {parseInline(line, `p-${i}`)}
       </p>
